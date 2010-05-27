@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+require "optparse"
+require "ostruct"
+require "selenium-interface.rb"
+require "commandline-options.rb"
+require "load-data.rb"
+
+options = parseOptions( ARGV )
+
+Process.exit unless options
+
+urls = getURLs( options )
+scans = getScans( options )
+
+puts urls
+
+puts scans
+
+
+
+
+
+

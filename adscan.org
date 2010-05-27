@@ -1,0 +1,33 @@
+
+* guestlistapp
+** competitors
+http://www.eventbrite.com/
+http://www.ticketleap.com/  
+http://www.amiando.com/
+
+** blogs
+http://www.problogger.net/
+http://www.smashingmagazine.com/
+
+* 1.0 
+** input: list of competitor domains, list of pages to scrape
+** output: string match hits on competitor domain
+** TODO input: accepts file of urls
+** TODO adscan --repeat-url
+** TODO input: accepts list of competitors
+** DONE adscan --help
+   CLOSED: [2010-05-27 Thu 11:37]
+** DONE adscan urls-to-scan-file domains-to-find-file
+   CLOSED: [2010-05-27 Thu 11:37]
+
+
+* 1.1
+** output: metadata for matches
+
+
+
+* ad serving notes
+** doubleclick contains url
+** creatives.commindo-media.de contains url
+** flash
+*** perhaps can detect where flash link leads
