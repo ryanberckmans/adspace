@@ -12,9 +12,12 @@ http://www.smashingmagazine.com/
 * 1.0 
 ** input: list of competitor domains, list of pages to scrape
 ** output: string match hits on competitor domain
-** TODO input: accepts file of urls
-** TODO adscan --repeat-url
-** TODO input: accepts list of competitors
+** DONE input: accepts file of urls
+   CLOSED: [2010-05-27 Thu 16:20]
+** DONE adscan --repeat-url
+   CLOSED: [2010-05-27 Thu 16:20]
+** DONE input: accepts list of competitors
+   CLOSED: [2010-05-27 Thu 16:20]
 ** DONE adscan --help
    CLOSED: [2010-05-27 Thu 11:37]
 ** DONE adscan urls-to-scan-file domains-to-find-file
