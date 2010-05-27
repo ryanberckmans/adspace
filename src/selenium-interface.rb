@@ -1,10 +1,10 @@
 require "rubygems"
 require "selenium/client"
 
-def getPageSource( url )
+def getPageSource( url, seleniumHost )
   begin
     @browser = Selenium::Client::Driver.new \
-    :host => "localhost",
+    :host => seleniumHost,
     :port => 4444,
     :browser => "*firefox",
     :url => url,

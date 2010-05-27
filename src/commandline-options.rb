@@ -5,6 +5,7 @@ def parseOptions( argv )
   collectedOptions = OpenStruct.new
 
   collectedOptions.repeat = 1
+  collectedOptions.seleniumHost = "localhost"
 
   opts = OptionParser.new do |opts|
     opts.banner = "Usage: adscan [options]"
@@ -21,6 +22,10 @@ def parseOptions( argv )
 
     opts.on("-r", "--repeat-num-times INT", Integer, "Optional. Integer specifying how many times to repeat the scanning process for each url (default 1)") do |repeat|
       collectedOptions.repeat = repeat
+    end
+
+    opts.on("-h", "--selenium-host HOST", String, "Optional. Ip address or domain of selenium server (default localhost)") do |host|
+      collectedOptions.seleniumHost = host
     end
 
     opts.on("-v", "--verbose", "Optional. Verbose mode") do

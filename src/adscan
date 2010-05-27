@@ -7,6 +7,11 @@ require "selenium-interface.rb"
 require "commandline-options.rb"
 require "load-data.rb"
 
+
+###############
+## init 
+###############
+
 options = parseOptions( ARGV )
 
 Process.exit unless options
@@ -14,7 +19,15 @@ Process.exit unless options
 urls = getURLs( options )
 scans = getScans( options )
 
+
+################
+## option logic
+################
+
 if options.verbose then
+  puts "selenium server host: " + options.seleniumHost
+  puts "selenium server port: 4444"
+  
   puts "repeating each url #{options.repeat} times"
   
   puts "urls (found #{urls.length}):"
@@ -29,14 +42,20 @@ if options.bail then
   Process.exit
 end
 
+
+###################
+## actual adscan
+###################
+
 matches = []
 
 options.repeat.times { |i|
   urls.each do |url|
-    html = getPageSource url
-    
+    html = getPageSource( url, options.seleniumHost )
+
     scans.each { |scan|
-      if html =~ /#{scan}/ then
+      if html.scan( scan ) then
+        puts "match!"
         match = OpenStruct.new
         match.url = url
         match.scan = scan
