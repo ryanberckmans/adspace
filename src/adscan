@@ -1,7 +1,8 @@
 #!/usr/bin/ruby
 
-require "optparse"
 require "ostruct"
+require "set"
+require "pp"
 require "selenium-interface.rb"
 require "commandline-options.rb"
 require "load-data.rb"
@@ -13,9 +14,50 @@ Process.exit unless options
 urls = getURLs( options )
 scans = getScans( options )
 
-puts urls
+if options.verbose then
+  puts "repeating each url #{options.repeat} times"
+  
+  puts "urls (found #{urls.length}):"
+  urls.each { |url| puts " " + url }
 
-puts scans
+  puts "scans (found #{scans.length}):"
+  scans.each { |scan| puts " " + scan }
+end
+
+if options.bail then
+  puts "--bail invoked, terminating"
+  Process.exit
+end
+
+matches = []
+
+options.repeat.times { |i|
+  urls.each do |url|
+    html = getPageSource url
+    
+    scans.each { |scan|
+      if html =~ /#{scan}/ then
+        match = OpenStruct.new
+        match.url = url
+        match.scan = scan
+        match.date = Date.today.to_s
+        
+        matches.push match
+      end
+    }
+    
+  end
+
+  puts "done run #{i+1} of #{options.repeat}" if options.verbose
+}
+
+matches.each { |match|
+  puts match
+}
+
+
+
+  
 
 
 

@@ -1,13 +1,13 @@
 
 def _loadURLs( urlFile )
   urls = []
-  File.foreach( urlFile ) { |url| urls.push url }
+  File.foreach( urlFile ) { |url| urls.push url unless url =~ /\#/ }
   urls
 end
 
 def _loadScans( scanFile )
   scans = []
-  File.foreach( scanFile ) { |scan| scans.push scan }
+  File.foreach( scanFile ) { |scan| scans.push( scan ) if scan.length > 1 and not (scan =~ /\#/) }
   scans
 end
 

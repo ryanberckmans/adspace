@@ -4,6 +4,8 @@ require "ostruct"
 def parseOptions( argv )
   collectedOptions = OpenStruct.new
 
+  collectedOptions.repeat = 1
+
   opts = OptionParser.new do |opts|
     opts.banner = "Usage: adscan [options]"
     opts.separator ""
@@ -15,6 +17,18 @@ def parseOptions( argv )
 
     opts.on("-s", "--scan-file FILE", String, "Required. Path to FILE containing strings to scan each web page for, one per line (each complete line is a string which is scanned for)") do |file|
       collectedOptions.scanFile = file
+    end
+
+    opts.on("-r", "--repeat-num-times INT", Integer, "Optional. Integer specifying how many times to repeat the scanning process for each url (default 1)") do |repeat|
+      collectedOptions.repeat = repeat
+    end
+
+    opts.on("-v", "--verbose", "Optional. Verbose mode") do
+      collectedOptions.verbose = true
+    end
+
+    opts.on("-b", "--bail", "Optional. Set everything up but exit instead of connecting to selenium server") do
+      collectedOptions.bail = true
     end
 
     opts.on_tail("-h", "--help", "Show this message") do
@@ -45,6 +59,6 @@ def parseOptions( argv )
     puts opts
     return
   end
-  
+
   collectedOptions
 end
