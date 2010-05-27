@@ -49,30 +49,36 @@ end
 
 matches = []
 
-options.repeat.times { |i|
+options.repeat.times do |i|
   urls.each do |url|
     html = getPageSource( url, options.seleniumHost )
-
-    scans.each { |scan|
-      if html.scan( scan ) then
-        puts "match!"
+    
+    scans.each do |scan|
+      
+      if html =~ /#{scan}/i then
         match = OpenStruct.new
         match.url = url
         match.scan = scan
+        match.html = html
         match.date = Date.today.to_s
-
         matches.push match
       end
-    }
+    end
     
   end
 
   puts "done run #{i+1} of #{options.repeat}" if options.verbose
-}
+end
 
-matches.each { |match|
-  puts match
-}
+if matches.length > 0 then
+  puts "matches:"
+  matches.each do |match|
+    puts "#{match.scan} found advertising on #{match.url}"
+    File.open("./#{match.scan}.html", 'a') { |f| f.write(match.html) }
+  end
+else
+  puts "no matches found"
+end
 
 
 

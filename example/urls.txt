@@ -1,2 +1,4 @@
-# http://www.problogger.net/
+http://www.problogger.net/
 http://www.smashingmagazine.com/
+http://css-tricks.com/
+
