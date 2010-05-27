@@ -60,7 +60,7 @@ options.repeat.times { |i|
         match.url = url
         match.scan = scan
         match.date = Date.today.to_s
-        
+
         matches.push match
       end
     }
