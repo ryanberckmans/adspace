@@ -1,16 +1,9 @@
 #!/usr/bin/ruby
 
-require "ostruct"
-require "set"
-require "pp"
-require "selenium-interface.rb"
 require "commandline-options.rb"
 require "load-data.rb"
-
-
-###############
-## init 
-###############
+require "scan.rb"
+require "process-matches.rb"
 
 options = parseOptions( ARGV )
 
@@ -18,11 +11,6 @@ Process.exit unless options
 
 urls = getURLs( options )
 scans = getScans( options )
-
-
-################
-## option logic
-################
 
 if options.verbose then
   puts "selenium server host: " + options.seleniumHost
@@ -42,43 +30,9 @@ if options.bail then
   Process.exit
 end
 
+matches = runScan( urls, scans, options )
 
-###################
-## actual adscan
-###################
-
-matches = []
-
-options.repeat.times do |i|
-  urls.each do |url|
-    html = getPageSource( url, options.seleniumHost )
-    
-    scans.each do |scan|
-      
-      if html =~ /#{scan}/i then
-        match = OpenStruct.new
-        match.url = url
-        match.scan = scan
-        match.html = html
-        match.date = Date.today.to_s
-        matches.push match
-      end
-    end
-    
-  end
-
-  puts "done run #{i+1} of #{options.repeat}" if options.verbose
-end
-
-if matches.length > 0 then
-  puts "matches:"
-  matches.each do |match|
-    puts "#{match.scan} found advertising on #{match.url}"
-    File.open("./#{match.scan}.html", 'a') { |f| f.write(match.html) }
-  end
-else
-  puts "no matches found"
-end
+processMatches matches
 
 
 

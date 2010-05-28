@@ -1,9 +1,7 @@
 
-
 def _valid( entry )
   return false if entry.lstrip.length < 1
   return false if entry =~ /\#/
-  
   true
 end
 
@@ -18,7 +16,6 @@ def _loadScans( scanFile )
   File.foreach( scanFile ) { |scan| scans.push( scan.chomp ) if _valid(scan) }
   scans
 end
-
 
 def getURLs( options )
   begin
