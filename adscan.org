@@ -3,9 +3,11 @@
 * http://www.extremevp.com/application/submission-form/
 ** Company Name
 StatsEmpire
-** Company Infomation
-** Founders
-** Achievements
+** Company Infomation - Company URL if any, phone number, email, TwitterID, blog posts about the company
+** Founders - Name, education, work experience (incl. present employer), personal URL
+** Achievements - Why are you and your team so kick-ass
+** Product - What is the product, the market size, painkiller/vitamin, the problem it solves, demo/video URL
+
 
 
 * guestlistapp
