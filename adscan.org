@@ -27,7 +27,6 @@ Worked on a classified project called the Pegasus Program for the NSA, FBI, CIA,
 Market Intelligence, 1.5 years, FreshBooks (largest online invoicing company)
 In charge of analytics and reporting. A blend of programming, business sense, and statistics was used to maximize conversion rates through the customer aquisition funnel as well as to optimize advertizing campaigns. Open sourced a gtest calculator at http://github.com/zachaysan/Split-Test-with-the-G-Test.
 
-
 Ryan Berckmans
 ryan.berckmans@gmail.com 
 Computer Science, University of Waterloo
