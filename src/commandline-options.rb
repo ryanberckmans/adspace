@@ -16,7 +16,7 @@ def parseOptions( argv )
       collectedOptions.urlFile = file
     end
 
-    opts.on("-s", "--scan-file FILE", String, "Required. Path to FILE containing strings to scan each web page for, one per line (each complete line is a string which is scanned for)") do |file|
+    opts.on("-a", "--advertisers-file FILE", String, "Required. Path to FILE containing advertisers to scan each web page for, one per line (each complete line is an advertiser which is scanned for)") do |file|
       collectedOptions.scanFile = file
     end
 
