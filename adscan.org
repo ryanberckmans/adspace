@@ -91,6 +91,7 @@ What have you done/built in the past, how do you know your other founders, have 
 What is different about your approach, what do you know that others do not, what unique experience does your team have
 ** Exit *
 What sort of exit do you eventually expect (IPO, acquisition, other)
+
 ** Moats *
 What sort of barriers block others from following you (patents, unique information, first mover advantage)
 ** Commitment *
