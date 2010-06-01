@@ -89,9 +89,17 @@ Who is the competition, how big are they
 What have you done/built in the past, how do you know your other founders, have you worked with your founders before
 ** Knowledge *
 What is different about your approach, what do you know that others do not, what unique experience does your team have
+Zach Aysan knows how online marketing and advertising work, while
+still being able to code. His experience optimizing advertizing
+campaigns and setting up and running split tests will mean that he is
+able to bring tools and information to Stats Empire's clients that are
+worth buying. It also means that he knows how to market 
 ** Exit *
 What sort of exit do you eventually expect (IPO, acquisition, other)
-
+We are not planning on exiting. We think that we can
+make enough money to stand on our own. Profitable companies get large
+offers. We hope to turn down many large offers. An IPO seems like the
+most likely outcome.
 ** Moats *
 What sort of barriers block others from following you (patents, unique information, first mover advantage)
 ** Commitment *
