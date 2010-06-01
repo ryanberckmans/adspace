@@ -1,26 +1,119 @@
 
 
 * http://www.extremevp.com/application/submission-form/
-** Company Name
-StatsEmpire
-** Company Infomation - Company URL if any, phone number, email, TwitterID, blog posts about the company
-** Founders - Name, education, work experience (incl. present employer), personal URL
+** Company Info
+Statistics Empire
 
-Ryan Berckmans will co
+Company Information *
+Company URL if any, phone number, email, TwitterID, blog posts about the company
 
-Ryan Berckmans studied computer science, and was twice awarded a rating of Outstanding while
+Owned, but unused, domain name: statisticsempire.com
+Phone: 416.877.9698
+Email: statisticsempire@gmail.com
+No current blog posts. 
+
+I think that I should explain why Stats Empire doesn't have a trace of an online presence.
+First, we have been full time for about 2 weeks. We had, originally, decided to bootstrap Stats Empire. Since then we have been flooded with client work. Since neither one of us is a graphic/web designer, we couldn't whip up a website quickly, and we wouldn't have had time even if we had the skills. 
+
+** Founders
+Name, education, work experience (incl. present employer), personal URL
+
+Zach Aysan
+Structural Engineering, University of Waterloo
+Nominated for Co-op Student of the year (2007), multiple "Outstanding" co-op evaluatoins
+Hacker since the age of 6.
+
+Relevent work experience
+Junior Software Developer, 3 years, Elabs Inc (a software consultancy)
+Worked on a classified project called the Pegasus Program for the NSA, FBI, CIA, and state Sherrif's offices.
+
+Market Intelligence, 1.5 years, FreshBooks (largest online invoicing company)
+In charge of analytics and reporting. A blend of programming, business sense, and statistics was used to maximize conversion rates through the customer aquisition funnel as well as to optimize advertizing campaigns. Open sourced a gtest calculator at http://github.com/zachaysan/Split-Test-with-the-G-Test.
 
 
-Ryan Berckmans expects completion of his degree, Bachelor of Computer Science, Co-op Option, degree attended the University of Waterloo
-Bachelor of Computer Science, Co-op Option, University of Waterloo
+Ryan Berckmans
+ryan.berckmans@gmail.com 
+Computer Science, University of Waterloo
+Multiple "Outstanding" co-op evaluations at Amazon.com
 
-Ryan twice took on the role of Software Development Engineer Intern at Amazon.com in Seattle, where he was awarded a rating of Outstanding, the highest rating a University of Wateloo co-op student can achieve. Prior to Amazon, Ryan was involved in a bootstrapped web development startup and spent a year working on a blockbuster video game for Xbox360.
+Relevent work experience
+Software Development Engineer Intern, 9 months, Amazon.com
 
+Lead Developer, 8 months, software web consulting startup (a summer project)
 
-** Achievements - Why are you and your team so kick-ass
-** Product - What is the product, the market size, painkiller/vitamin, the problem it solves, demo/video URL
+Co-op Programmer, 1 year, Silicon Knights Inc
+Duties evolved from junior tasks to being the foremost developer and expert on some critical modules for a blockbuster Xbox360 game.
 
+** Achievements
+Why are you and your team so kick-ass
+We're extremely smart, hardworking, outgoing, and friendly. 
 
+Ryan was among 20 students to receive offers from Amazon.com, from an applicant pool of over 200. 
+Of the 20 students hired, less than 25% received the top rating of Outstanding. 
+Ryan was offered a second internship and received a subsequent Outstanding.
+This places Ryan in the top percent of Waterloo Computer Science students, as measured by a Fortune 500 ecommerce technology company.
+
+** Product
+What is the product, the market size, painkiller/vitamin, the problem it solves, demo/video URL
+Stats Empire aims to build multiple products. Prototypes for each product have been hacked together and a working alpha version of the first product has been completed. 
+The first product is something we codenamed AdScan. This is where we will focus our time during the incubation program.
+
+AdScan crawls through the internet and organizes where people buy banner ad space. By keeping track of how long businesses advertizes on a site a relative measure of a specific banner ad's effectiveness can be ascertained. By using Natural Language Processing (NLP) companies are automatically grouped into groups of competitors. So, for example, Microsoft is a competitor with both Apple and Nintendo, but Apple is not a competitor with Nintendo.
+
+Online advertizing is a numbers game. A company spends $200k to find out the $150k they should completely throw out, by allowing our clients a view into where their competitors are advertising we allow them to save on the exploritory portion of their advertising spend. Unlike key word advertising, banner ad advertising requires the advertiser to decide on a per website basis where to invest. 
+** Innovation
+What is different about what you are doing
+
+** Prototype
+Have you already started working on a prototype, who wrote the code, who owns the code
+
+Yes, our prototype is amazing, purely backend for now, but it is awesome anyways.  
+
+We wrote the code (except for some standard open source libraries). 
+
+We own the code. 
+** Technology
+Open/closed source, stack, interesting problems and solutions, why no one can copy this
+
+Open source stack. Blend of Ruby and Python (Ruby for bindings to Selenium, Python for access to the SciPy libraries). 
+Linux operating system, plan on expanding to Amazon Web Services (AWS) in the near future. 
+
+Interesting problems: 
+
+Ads are often rendered or tracked in Javascript or Flash so we needed to have access to a programmable browser in order to properly sort and scan target websites. By using Selenium we are able to get around that problem. 
+
+Our server is going to be busy, very busy. By using AWS we can:
+1. Store a ton of banner ad images for generated/customized reports.
+2. Fire up many, many servers to scan the whole internet without having to serially wait for each page to render. 
+
+Why nobody can copy this: People are going to try, but in the end most developers do not have: 
+1. A solid understanding of how the online advertising industry works.
+2. The technical knowhow on how to properly render the advertising.
+3. A development speed measured in km/s. 
+
+Knockoffs will not be able to keep up with our output rate. As we grow we will release multiple products, like compete.com and 37 Signals to build off our current user base. 
+** Revenue
+How is it going to make money
+This app will make money by:
+1. Charging people for the information. 
+2. Getting a referral fee from the blogs we direct our clients to. 
+
+Adv (was working on this section)
+** Competition *
+Who is the competition, how big are they
+** Experience *
+What have you done/built in the past, how do you know your other founders, have you worked with your founders before
+** Knowledge *
+What is different about your approach, what do you know that others do not, what unique experience does your team have
+** Exit *
+What sort of exit do you eventually expect (IPO, acquisition, other)
+
+** Moats *
+What sort of barriers block others from following you (patents, unique information, first mover advantage)
+** Commitment *
+Can all the founders work on this full time, how about after the program
+** Other 
+Why should we invest in you
 
 * guestlistapp
 ** competitors
