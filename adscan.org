@@ -59,6 +59,7 @@ AdScan crawls through the internet and organizes where people buy banner ad spac
 Online advertizing is a numbers game. A company spends $200k to find out the $150k they should completely throw out, by allowing our clients a view into where their competitors are advertising we allow them to save on the exploritory portion of their advertising spend. Unlike key word advertising, banner ad advertising requires the advertiser to decide on a per website basis where to invest. 
 ** Innovation
 What is different about what you are doing
+We are 
 
 ** Prototype
 Have you already started working on a prototype, who wrote the code, who owns the code
@@ -92,14 +93,21 @@ Knockoffs will not be able to keep up with our output rate. As we grow we will r
 How is it going to make money
 This app will make money by:
 1. Charging people for the information. 
-2. Getting a referral fee from the blogs we direct our clients to. 
+2. Getting a referral fee from the blogs we direct our clients to.
 
-Adv (was working on this section)
 ** Competition *
 Who is the competition, how big are they
+There are many players in the intelligence space, but we have first
+mover advantage for the banner ad space. Eventually we hope to
+strongly compete with some of Accenture's offerings, but for the time
+being this is a new space. 
+
 ** Experience *
-What have you done/built in the past, how do you know your other founders, have you worked with your founders before
+What have you done/built in the past, how do you know your other
+founders, have you worked with your founders before
+
 ** Knowledge *
+
 What is different about your approach, what do you know that others do not, what unique experience does your team have
 Zach Aysan knows how online marketing and advertising work, while
 still being able to code. His experience optimizing advertizing
@@ -110,14 +118,36 @@ worth buying. It also means that he knows how to market
 What sort of exit do you eventually expect (IPO, acquisition, other)
 We are not planning on exiting. We think that we can
 make enough money to stand on our own. Profitable companies get large
-offers. We hope to turn down many large offers. An IPO seems like the
-most likely outcome.
+offers. We hope to turn down many large offers. An IPO or share buy
+back would probably be the most likely outcome.
 ** Moats *
 What sort of barriers block others from following you (patents, unique information, first mover advantage)
+We could take the time to patent some of our processes and, of course,
+software, but since people are buying information that wouldn't be an
+effective method of stopping competitors. 
+
+The true moat that stops knock-off competitors is creating a really
+polished app that is hard to compete with and developing at a rate
+that others could not match. 
+
+We plan on being successful enough to where others start trying to
+copy us. Once we are there we will continue to create great
+intelligence apps for online businesses. 
+
 ** Commitment *
-Can all the founders work on this full time, how about after the program
+
+Can all the founders work on this full time, how about after the
+program?
+
 ** Other 
 Why should we invest in you
+You should invest in us because we solve problems for businesses.
+You should invest in us because we are nice, hardworking, smart guys. 
+You should invest in us because We will be a major name in the Toronto
+tech scene allowing you to attract more startups to fund.
+You should invest in us because we know online marketing, but don't
+have the overhead of a business-y guy that can't code. 
+You should invest in us because we will make you money.
 
 * guestlistapp
 ** competitors
