@@ -13,6 +13,8 @@ urls = getURLs( options )
 scans = getScans( options )
 
 if options.verbose then
+  puts "this scan being performed for client: " + options.humanClient
+  
   puts "selenium server host: " + options.seleniumHost
   puts "selenium server port: 4444"
   
@@ -32,7 +34,7 @@ end
 
 matches = runScan( urls, scans, options )
 
-processMatches matches
+processMatches( matches, options)
 
 
 

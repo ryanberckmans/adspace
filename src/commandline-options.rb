@@ -6,6 +6,7 @@ def parseOptions( argv )
 
   collectedOptions.repeat = 1
   collectedOptions.seleniumHost = "localhost"
+  collectedOptions.humanClient = "no-client"
 
   opts = OptionParser.new do |opts|
     opts.banner = "Usage: adscan [options]"
@@ -27,6 +28,10 @@ def parseOptions( argv )
     opts.on("-h", "--selenium-host HOST", String, "Optional. Ip address or domain of selenium server (default localhost)") do |host|
       collectedOptions.seleniumHost = host
     end
+
+    opts.on("-c", "--client CLIENT", String, "Optional. The human customer the scan is being performed for (default no-client)") do |client|
+      collectedOptions.humanClient = client
+    end    
 
     opts.on("-v", "--verbose", "Optional. Verbose mode") do
       collectedOptions.verbose = true

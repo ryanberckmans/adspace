@@ -1,3 +1,4 @@
+require "date"
 require "selenium-interface.rb"
 
 def runScan( urls, scans, options )

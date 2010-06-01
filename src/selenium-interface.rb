@@ -33,7 +33,8 @@ end
 
 def pageScreenshot( browser )
   begin
-    browser.capture_entire_page_screenshot_to_string
+    screenshot = browser.capture_entire_page_screenshot_to_string("")
+    screenshot
   rescue Exception => e
     close( browser )
   end
