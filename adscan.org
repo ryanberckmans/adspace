@@ -59,7 +59,13 @@ AdScan crawls through the internet and organizes where people buy banner ad spac
 Online advertizing is a numbers game. A company spends $200k to find out the $150k they should completely throw out, by allowing our clients a view into where their competitors are advertising we allow them to save on the exploritory portion of their advertising spend. Unlike key word advertising, banner ad advertising requires the advertiser to decide on a per website basis where to invest. 
 ** Innovation
 What is different about what you are doing
-We are 
+
+Ryan sees two distinct and correct angles here. We're doing "Awesome Split Testing" with "Automated Advertising Intelligence (A2I, cool name)".
+
+Awesome Split Testing angle: A/B, split testing is a new space. Companies are doing split testing in droves, however third-party (off-the-shelf) split testing frameworks focus on technical functionality, and not on revenue-generating statistics.  Our product analyzes, interprets, and suggests split testing based upon revenue-generating factors such as customer profile and market segmentation.
+
+Automated Advertising Intelligence A2I angle: One way to segment the advertising space is as follows: places you and your competitors advertise, places only your competitors advertise, and places neither you or your competitor advertise. The first space is covered, third is covered, we want to be first-to-market for automated competitor advertising solutions.
+
 
 ** Prototype
 Have you already started working on a prototype, who wrote the code, who owns the code
