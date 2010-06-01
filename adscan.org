@@ -2,11 +2,8 @@
 
 * http://www.extremevp.com/application/submission-form/
 ** Company Info
-Statistics Empire
 
-Company Information *
-Company URL if any, phone number, email, TwitterID, blog posts about the company
-
+StatsEmpire
 Owned, but unused, domain name: statisticsempire.com
 Phone: 416.877.9698
 Email: statisticsempire@gmail.com
