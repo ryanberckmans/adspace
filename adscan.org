@@ -5,6 +5,18 @@
 StatsEmpire
 ** Company Infomation - Company URL if any, phone number, email, TwitterID, blog posts about the company
 ** Founders - Name, education, work experience (incl. present employer), personal URL
+
+Ryan Berckmans will co
+
+Ryan Berckmans studied computer science, and was twice awarded a rating of Outstanding while
+
+
+Ryan Berckmans expects completion of his degree, Bachelor of Computer Science, Co-op Option, degree attended the University of Waterloo
+Bachelor of Computer Science, Co-op Option, University of Waterloo
+
+Ryan twice took on the role of Software Development Engineer Intern at Amazon.com in Seattle, where he was awarded a rating of Outstanding, the highest rating a University of Wateloo co-op student can achieve. Prior to Amazon, Ryan was involved in a bootstrapped web development startup and spent a year working on a blockbuster video game for Xbox360.
+
+
 ** Achievements - Why are you and your team so kick-ass
 ** Product - What is the product, the market size, painkiller/vitamin, the problem it solves, demo/video URL
 
