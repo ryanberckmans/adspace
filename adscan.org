@@ -1,4 +1,13 @@
 
+
+* http://www.extremevp.com/application/submission-form/
+** Company Name
+StatsEmpire
+** Company Infomation
+** Founders
+** Achievements
+
+
 * guestlistapp
 ** competitors
 http://www.eventbrite.com/
@@ -23,14 +32,27 @@ http://www.smashingmagazine.com/
 ** DONE adscan urls-to-scan-file domains-to-find-file
    CLOSED: [2010-05-27 Thu 11:37]
 
-
 * 1.1
 ** output: metadata for matches
 
 
-
 * ad serving notes
-** doubleclick contains url
-** creatives.commindo-media.de contains url
-** flash
-*** perhaps can detect where flash link leads
+** formatting
+*** doubleclick
+**** fully anonymous
+***** no content identifiers
+***** image-srcs expire quickly, but links persist (in case a customer clicks on an ad a few minutes after page loads)
+**** a microsoft ad on slashdot
+***** loads msft ad <script src="http://ad.doubleclick.net/adj/ostg.slashdot/pg_index_p83_medrec;pg=index2;logged_in=0;tile=2;ord=6617129833169799?" type="text/javascript"></script>
+***** target of msft advert <a href="http://ad.doubleclick.net/activity;src%3D1251056%3Bmet%3D1%3Bv%3D1%3Bpid%3D47077323%3Baid%3D223827483%3Bko%3D2%3Bcid%3D36742048%3Brid%3D36759926%3Brv%3D1%3Bcs%3Dd%3Beid1%3D310214%3Becn1%3D1%3Betm1%3D0%3B_dc_redir%3Durl%3fhttp://ad.doubleclick.net/click%3Bh%3Dv8/39a8/3/0/%2a/a%3B223827483%3B0-0%3B2%3B47077323%3B255-0/0%3B36742048/36759926/1%3B%3B%7Eokv%3D%3Bpg%3Dindex2%3Blogged_in%3D0%3Btile%3D2%3B%7Esscs%3D%3fhttp://clk.atdmt.com/CAM/go/216103640/direct/01/" target="_blank"><img border="0" width="300" height="600" alt="" src="http://s0.2mdn.net/1251056/PID_1311582_YABAeQBAL6U36JxC.png"></a>
+***** a microsoft adversitsement <img border="0" width="300" height="600" alt="" src="http://s0.2mdn.net/1251056/PID_1311582_YABAeQBAL6U36JxC.png">
+**** ad serving chain, resulting in a flash ad, which is not a link (ad for dish detergent needs no link):
+***** begins with this: <script src="http://ad.doubleclick.net/adj/ars.dart/homepage;abr=!webtv;mtfIFPath=/mt-static/plugins/ArsTheme/ad-campaigns/doubleclick/;tile=2;sz=300x250;kw=top;ord=47090182003631780" type="text/javascript"></script>
+***** more js, followed by <object width="300" height="250" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"><param value="http://cdn1.telemetryverification.net/tv2n/presenter/deploys/inbanner/r0061/tv2npresenter.swf?ord=1275057702966" name="movie"><param value="high" name="quality"><param value="#ffffff" name="bgcolor"><param value="opaque" name="wmode"><param value="noScale" name="scale"><param value="always" name="AllowScriptAccess"><param value="spaceguid=Btox8aEHW1vw-100%3A&amp;spacewidth=300&amp;spaceheight=250&amp;ad=%2Fcontent%2Frb%2Frb_resolve_monsterinlaw15sec_ca%2Fr0001%2Frb_resolve_monsterinlaw15sec_ca_450x360.swf&amp;adid=B2kbtnZ36Yjg&amp;cid=B2kbtnZ36Yjg&amp;bid=BLyk1wl0lIaI&amp;sig=877419&amp;mute=1&amp;impt=Ihttp%3A%2F%2Fxverify.net%2Fts%2Fpse1rndx5f585519097x5fx5ftimx5f1274211717x5fx5ftv2nspidx5fceehpgihidbgfeiehfbdghhh%2Fpse1%2Fblank.gif%3Frnd%3D%5Btimestamp%5D&amp;sid=3239557067647851477&amp;itm=3&amp;iframeurl=http%3A//spc.ceehpgihidbgfeiehfbdghhh.iban.telemetryverification.net/%3BsubTagID%3D100%3BsubTagName%3D%3BclickTrack%3D%3BimpactTrack%3D%3Bcb%3D%5Btimestamp%5D%3F" name="FlashVars"><embed width="300" height="250" flashvars="spaceguid=Btox8aEHW1vw-100%3A&amp;spacewidth=300&amp;spaceheight=250&amp;ad=%2Fcontent%2Frb%2Frb_resolve_monsterinlaw15sec_ca%2Fr0001%2Frb_resolve_monsterinlaw15sec_ca_450x360.swf&amp;adid=B2kbtnZ36Yjg&amp;cid=B2kbtnZ36Yjg&amp;bid=BLyk1wl0lIaI&amp;sig=877419&amp;mute=1&amp;impt=Ihttp%3A%2F%2Fxverify.net%2Fts%2Fpse1rndx5f585519097x5fx5ftimx5f1274211717x5fx5ftv2nspidx5fceehpgihidbgfeiehfbdghhh%2Fpse1%2Fblank.gif%3Frnd%3D%5Btimestamp%5D&amp;sid=3239557067647851477&amp;itm=3&amp;iframeurl=http%3A//spc.ceehpgihidbgfeiehfbdghhh.iban.telemetryverification.net/%3BsubTagID%3D100%3BsubTagName%3D%3BclickTrack%3D%3BimpactTrack%3D%3Bcb%3D%5Btimestamp%5D%3F" scale="noScale" allowscriptaccess="always" type="application/x-shockwave-flash" bgcolor="#ffffff" swliveconnect="TRUE" wmode="opaque" quality="high" src="http://cdn1.telemetryverification.net/tv2n/presenter/deploys/inbanner/r0061/tv2npresenter.swf?ord=1275057702966"></object>
+*** commindo-media.de
+**** http://creatives.commindo-media.de/www/delivery/ck.php?oaparams=2__bannerid=889__zoneid=11__cb=eb4ff9e928__oadest=http%3A%2F%2Fwww.wix.com%2Fstart%2Fwfree%3Futm_campaign%3Dsmashing%26experiment_id%3Dsmashflash19
+** solutions to advert anonymity problem
+*** process images : -D
+*** get selenium to click on the images and record landing domain
+*** build in per-ad-platform logic, i.e. doubleclick fully anonymizes advertisements, but commindo-media gives us the landing url
+
