@@ -1,4 +1,10 @@
 
+* TODO README in root
+* TODO project dependencies script (install ruby, gems, selenium client etc)
+* TODO Xvfb local, run selenium server locally
+* TODO adscan auto-launch and terminate local Xvfb selenium server
+* TODO screenshots, verify if Xvfb is breaking them
+
 
 * http://www.extremevp.com/application/submission-form/
 ** Company Info
