@@ -1,0 +1,5 @@
+#!/bin/bash
+
+Xvfb :98 -ac&
+export DISPLAY=:98
+java -jar selenium-server.jar
