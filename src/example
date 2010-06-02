@@ -1,2 +1,2 @@
 #!/bin/bash
-./adscan -u ../examples/urls.txt -s ../examples/guestlist-competitors.txt -v -r 1 -c AwesomeClient
+./adscan -u ../examples/urls.txt -a ../data/global-competitor-list -v -r 1 -c AwesomeClient

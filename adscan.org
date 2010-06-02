@@ -1,10 +1,18 @@
-
+* TODO when a known adserver is detected, but there is no match or the adserver anonymizes, have selenium check if the target landing page is a match
+** use case: doubleclick anonymizes all ads
+** use case: the target url is not anonymized, but it's a redirect and we're not sure what the true target url is
+*** http://creatives.commindo-media.de/www/delivery/ck.php?oaparams=2__bannerid=1508__zoneid=11__cb=369f80e5c9__oadest=http://altfarm.mediaplex.com/ad/ck/14302-101043-32561-0?mpt=369f80e5c9
+*** the above link is for Constant Contact
+* TODO support multi-token and/or regex scans
+** use case: constantcontact might appear as Constant Contact or any other permutation
+** use case: match any advertisement with certain tokens in the url or the description
+* TODO enable eol comments in data files
 * TODO README in root
 * TODO project dependencies script (install ruby, gems, selenium client etc)
-* TODO Xvfb local, run selenium server locally
 * TODO adscan auto-launch and terminate local Xvfb selenium server
+* TODO support --ssh-tunnel when --selenium-host is used
 * TODO screenshots, verify if Xvfb is breaking them
-
+** local Xvfb produces black screenshots, too
 
 * http://www.extremevp.com/application/submission-form/
 ** Company Info

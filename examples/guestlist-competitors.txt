@@ -1,6 +1,3 @@
 eventbrite
 ticketleap
-freshbooks
 amiando
-constantcontact
-mailchimp

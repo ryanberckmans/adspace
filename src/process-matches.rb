@@ -1,25 +1,27 @@
-require 'digest/md5'
 require 'base64'
 require 'set'
+require 'util.rb'
 
-def _summary( matches, options )
+def _summary( scansWithMatch, options )
   puts 
   puts "--------------------------"
   puts "summary:"
   puts " (search performed for #{options.humanClient})"
   puts "-------"
   
-  matches.keys.sort.each do |key|
-    puts "  #{key} advertises on:"
+  scansWithMatch.keys.sort.each do |scan|
+    puts "  #{scan} advertises on:"
+
+    scanResult = scansWithMatch[scan]
 
     urls = Set.new
     
-    matches[key].each do
+    scanResult.matches.each do
       |match|
-      urls.add match.url
+      urls.add "#{match.url} (adserver #{match.adserver})"
     end
     
-    urls.each do
+    urls.sort.each do
       |url|
       puts "    #{url}"
     end
@@ -48,7 +50,7 @@ def _write_to_file( matches, options )
 
         begin
           screenshot = Base64.decode64(match.screenshot)
-          screenshotFilename = Digest::MD5.hexdigest(screenshot)
+          screenshotFilename = md5(screenshot)
           
           File.open("./#{options.humanClient}/#{screenshotFilename}.png", 'wb') do |sf|
             sf.write(screenshot)
@@ -66,14 +68,14 @@ def _write_to_file( matches, options )
   end
 end
 
-def processMatches( matches, options )
+def processMatches( scansWithMatch, options )
 
-  if matches.empty? then
+  if scansWithMatch.empty? then
     puts "no matches found"
     return
   end
 
-  _write_to_file( matches, options )
+  #_write_to_file( matches, options )
 
-  _summary( matches, options )
+  _summary( scansWithMatch, options )
 end

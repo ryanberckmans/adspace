@@ -20,10 +20,10 @@ if options.verbose then
   
   puts "repeating each url #{options.repeat} times"
   
-  puts "urls (found #{urls.length}):"
+  puts "urls scanned (found #{urls.length}):"
   urls.each { |url| puts " " + url }
 
-  puts "scans (found #{scans.length}):"
+  puts "competitors sought (found #{scans.length}):"
   scans.each { |scan| puts " " + scan }
 end
 
@@ -32,9 +32,9 @@ if options.bail then
   Process.exit
 end
 
-matches = runScan( urls, scans, options )
+scansWithMatch = runScan( urls, scans, options )
 
-processMatches( matches, options)
+processMatches( scansWithMatch, options)
 
 
 

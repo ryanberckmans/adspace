@@ -25,7 +25,7 @@ def parseOptions( argv )
       collectedOptions.repeat = repeat
     end
 
-    opts.on("-h", "--selenium-host HOST", String, "Optional. Ip address or domain of selenium server (default localhost)") do |host|
+    opts.on("--selenium-host HOST", String, "Optional. Ip address or domain of selenium server (default localhost)") do |host|
       collectedOptions.seleniumHost = host
     end
 
