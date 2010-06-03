@@ -40,7 +40,7 @@ def _write_to_file( scansWithMatch, options )
   begin
     File.open("./#{options.humanClient}/index.html", 'w') do |f|
       
-      f.write "<html><head><title>Adscan results for #{options.humanClient}</title></head><body>"
+      f.write "<html><head><title>AdChart results for #{options.humanClient}</title></head><body>"
 
       f.write "<h1>Results Summary:</h1>"
       
