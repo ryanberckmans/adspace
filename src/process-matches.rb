@@ -41,7 +41,7 @@ def _write_to_file( scansWithMatch, options )
     File.open("./#{options.humanClient}/index.html", 'w') do |f|
       
       f.write "<html><head><title>AdChart results for #{options.humanClient}</title></head><body>"
-
+      f.write "<link rel=\"stylesheet\" type=\"text/css\" href=\"../styles.css\">"
       f.write "<h1>Results Summary:</h1>"
       
       scansWithMatch.keys.sort.each do |scan|
