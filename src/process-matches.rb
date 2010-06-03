@@ -70,7 +70,7 @@ def _write_to_file( scansWithMatch, options )
 
             f.write "<div class=\"ad-detail\">"
             f.write "  <a href=\"#{match.linkUrl}\"> #{match.innerHtml} </a>"
-            f.write "  <br>ad served by: #{match.adserver}"
+            f.write "  <br>(#{match.adserver})"
             f.write "</div>"
 
             

@@ -3,7 +3,7 @@ require "selenium-interface.rb"
 require "util.rb"
 
 class Adserver
-  MATCH_FOUND_BUT_NO_ADSERVER_DETECTED = "none"
+  MATCH_FOUND_BUT_NO_ADSERVER_DETECTED = "no adserver"
   COMMINDO_MEDIA="commindo-media.de"
 end
 
