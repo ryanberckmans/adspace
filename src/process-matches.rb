@@ -28,7 +28,7 @@ def _summary( scansWithMatch, options )
   end
 end
 
-def _write_to_file( matches, options )
+def _write_to_file( scansWithMatch, options )
   puts
   puts "saving match data to client subdirectory ./#{options.humanClient}"
 
@@ -36,36 +36,56 @@ def _write_to_file( matches, options )
     FileUtils.mkdir("./#{options.humanClient}")
   rescue Exception => e
   end
-  File.open("./#{options.humanClient}/index.html", 'w') do |f|
+  
+  begin
+    File.open("./#{options.humanClient}/index.html", 'w') do |f|
+      
+      f.write "<html><head><title>Adscan results for #{options.humanClient}</title></head><body>"
 
-    f.write("<html><head><title>Adscan results for #{options.humanClient}</title></head><body>(screenshots work in progress)<br>")
-
-    matches.keys.each do |key|
-      f.write("<h2>Competitor #{key} advertisements detected:</h2>")
-
-      matches[key].each do
-        |match|
-
-        f.write("url: #{match.url}<br>")
-
-        begin
-          screenshot = Base64.decode64(match.screenshot)
-          screenshotFilename = md5(screenshot)
-          
-          File.open("./#{options.humanClient}/#{screenshotFilename}.png", 'wb') do |sf|
-            sf.write(screenshot)
-          end
-
-          f.write("<img src=\"busted.png\" alt=\"screenshot unavailable (work in progress)\"/><br>")
-        rescue Exception => e
-        end
+      f.write "<h1>Results Summary:</h1>"
+      
+      scansWithMatch.keys.sort.each do |scan|
+        f.write "<h2>#{scan} advertisements</h2>"
         
+        scanResult = scansWithMatch[scan]
+        
+        urls = {}
+        
+        scanResult.matches.each do |match|
+          urls[match.url] = [] unless urls[match.url]
+          urls[match.url].push match
+        end
+
+        urls.each_key do
+          |url|
+          
+          f.write "<h3>#{url}:</h3>"
+
+          uniqueInnerHtml = Set.new
+          
+          urls[url].each do |match|
+
+            next unless not uniqueInnerHtml.include? match.innerHtml
+            uniqueInnerHtml.add match.innerHtml
+
+            f.write "<div class=\"ad-detail\">"
+            f.write "  <a href=\"#{match.linkUrl}\"> #{match.innerHtml} </a>"
+            f.write "  <br>ad served by: #{match.adserver}"
+            f.write "</div>"
+
+            
+          end
+        end
       end
       
+      f.write "</body></html>"
     end
-
-    f.write("</body></html>")
+  rescue Exception => e
+    puts "error writing to file"
+    raise
   end
+
+  system "google-chrome ./#{options.humanClient}/index.html&"
 end
 
 def processMatches( scansWithMatch, options )
@@ -75,7 +95,7 @@ def processMatches( scansWithMatch, options )
     return
   end
 
-  #_write_to_file( matches, options )
+  _write_to_file( scansWithMatch, options )
 
   _summary( scansWithMatch, options )
 end

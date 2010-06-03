@@ -14,6 +14,13 @@
 * TODO screenshots, verify if Xvfb is breaking them
 ** local Xvfb produces black screenshots, too
 
+
+* client webpage output
+
+Your competitor mailchimp was found advertising on:
+
+
+
 * http://www.extremevp.com/application/submission-form/
 ** Company Info
 
