@@ -41,6 +41,7 @@ def _write_to_file( scansWithMatch, options )
     File.open("./#{options.humanClient}/index.html", 'w') do |f|
       
       f.write "<html><head><title>AdChart results for #{options.humanClient}</title></head><body>"
+      f.write "<div id=\"container\">"
       f.write "<link rel=\"stylesheet\" type=\"text/css\" href=\"../styles.css\">"
       f.write "<h1>Results Summary:</h1>"
       
@@ -73,11 +74,11 @@ def _write_to_file( scansWithMatch, options )
             f.write "  <br>(#{match.adserver})"
             f.write "</div>"
 
-            
           end
         end
       end
-      
+
+      f.write "</div>"
       f.write "</body></html>"
     end
   rescue Exception => e
