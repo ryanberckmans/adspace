@@ -69,9 +69,8 @@ def _makeWebpage( scansWithMatch, options )
         urls.each_key do
           |url|
           
-          f.write "<h3>#{url}:</h3>"
-
           f.write "<div class=\"ad-list\">"
+          f.write "<h3>#{url}:</h3>"
 
           uniqueInnerHtml = Set.new
           
@@ -96,7 +95,7 @@ def _makeWebpage( scansWithMatch, options )
     raise
   end
 
-  system "google-chrome ./#{options.humanClient}/index.html&"
+  system "google-chrome ../client/#{options.humanClient}/index.html&"
 end
 
 def processMatches( scansWithMatch, options )
