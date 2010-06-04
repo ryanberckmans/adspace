@@ -71,6 +71,8 @@ def runScan( urls, scans, options )
       begin
         browser = browser( url, options.seleniumHost )
         html = getPageSource( browser )
+
+        next unless browser and html
         
         scans.each do |scan|
           next unless matches = _searchHtmlForMatches( html, scan )
