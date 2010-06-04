@@ -28,22 +28,29 @@ def _summary( scansWithMatch, options )
   end
 end
 
-def _write_to_file( scansWithMatch, options )
-  puts
-  puts "saving match data to client subdirectory ./#{options.humanClient}"
-
+def _makeClientDirectories( options )
   begin
-    FileUtils.mkdir("./#{options.humanClient}")
+    FileUtils.mkdir("../client")
   rescue Exception => e
   end
+
+  begin
+    FileUtils.mkdir("../client/#{options.humanClient}")
+  rescue Exception => e
+  end
+end
+
+def _makeWebpage( scansWithMatch, options )
+  puts
+  puts "saving match data to client subdirectory ../client/#{options.humanClient}"
+
+  _makeClientDirectories options
   
   begin
-    File.open("./#{options.humanClient}/index.html", 'w') do |f|
+    File.open("../client/#{options.humanClient}/index.html", 'w') do |f|
       
       f.write "<html><head><title>Adscan results for #{options.humanClient}</title></head><body>"
 
-      f.write "<h1>Results Summary:</h1>"
-      
       scansWithMatch.keys.sort.each do |scan|
         f.write "<h2>#{scan} advertisements</h2>"
         
@@ -61,22 +68,22 @@ def _write_to_file( scansWithMatch, options )
           
           f.write "<h3>#{url}:</h3>"
 
+          f.write "<div class=\"ad-list\">"
+
           uniqueInnerHtml = Set.new
           
           urls[url].each do |match|
-
             next unless not uniqueInnerHtml.include? match.innerHtml
             uniqueInnerHtml.add match.innerHtml
 
             f.write "<div class=\"ad-detail\">"
-            f.write "  <a href=\"#{match.linkUrl}\"> #{match.innerHtml} </a>"
-            f.write "  <br>(#{match.adserver})"
+            f.write "  <a href=\"#{match.linkUrl}\" target=\"_blank\"> #{match.innerHtml} </a>"
+            f.write "  <p>(#{match.adserver})</p>"
             f.write "</div>"
-
-            
           end
-        end
-      end
+          f.write "</div>"
+        end # urls.each_key
+      end # each competitor
       
       f.write "</body></html>"
     end
@@ -95,7 +102,7 @@ def processMatches( scansWithMatch, options )
     return
   end
 
-  _write_to_file( scansWithMatch, options )
+  _makeWebpage( scansWithMatch, options )
 
   _summary( scansWithMatch, options )
 end
