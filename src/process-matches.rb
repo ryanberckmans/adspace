@@ -49,8 +49,11 @@ def _makeWebpage( scansWithMatch, options )
   begin
     File.open("../client/#{options.humanClient}/index.html", 'w') do |f|
       
-      f.write "<html><head><title>Adscan results for #{options.humanClient}</title></head><body>"
+      f.write "<html><head><title>AdChart results for #{options.humanClient}</title><link rel=\"stylesheet\" type=\"text/css\" href=\"../web/styles.css\"></head><body>"
 
+      f.write "<div id=\"header\"><div class=\"content\"> </div> </div>"
+      f.write "<div id=\"container\">"
+      
       scansWithMatch.keys.sort.each do |scan|
         f.write "<h2>#{scan} advertisements</h2>"
         
@@ -81,10 +84,11 @@ def _makeWebpage( scansWithMatch, options )
             f.write "  <p>(#{match.adserver})</p>"
             f.write "</div>"
           end
-          f.write "</div>"
+          f.write "</div>" # ad-list
         end # urls.each_key
       end # each competitor
-      
+
+      f.write "</div>" # container
       f.write "</body></html>"
     end
   rescue Exception => e
