@@ -1,4 +1,6 @@
 
+* zach
+* end-of-zach
 * high level design
 ** finding ads
 *** anonymized ads
@@ -18,7 +20,7 @@
 **** 2. have Mr. off-shore-resource inquire into advertising costs for that site
 **** 3. calculate how much money each competitor is spending on advertising for that site
 *** frequency data
-**** "IAD square observed on 17 out of 20 url hits for qq.com, but only 5 out of 20 url hits for ww.com" => competitor bid higher for qq.com, or more competition on ww.com, tec
+**** "IAD square observed on 17 out of 20 url hits for qq.com, but only 5 out of 20 url hits for ww.com" => competitor bid higher for qq.com, or more competition on ww.com, etc
 *** getting inside flash
 ** saving data to database
 *** adscanner daemon
