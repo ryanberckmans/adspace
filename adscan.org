@@ -1,6 +1,20 @@
 
 * zach
 * end-of-zach
+
+
+
+* sqs initial pass
+** scanner daemon
+** selenium-server daemon
+** startup application pushes urls.txt into sqs
+** scanner daemon picks up one url at a time
+** scanner maintains results in memory
+** scanner picksup create-webpage message from sqs and processes data, but retains data in RAM
+** scanner checks sqs at most once per minute
+** TODO what about duplicate urls?
+
+
 * high level design
 ** finding ads
 *** anonymized ads
@@ -33,6 +47,7 @@
 
 
 
+* TODO migrate statsempire passwords to a new pwsafe file
 * TODO when a known adserver is detected, but there is no match or the adserver anonymizes, have selenium check if the target landing page is a match
 ** use case: doubleclick anonymizes all ads
 ** use case: the target url is not anonymized, but it's a redirect and we're not sure what the true target url is
