@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ "`uname`" != "Linux" ]; then
+    echo "$0 installs the project dependencies on a debian machine"
+    exit
+fi
+
+sudo aptitude install ruby rubygems irb xvfb openssh-client google-chrome-beta
+sudo gem install selenium-client right_aws

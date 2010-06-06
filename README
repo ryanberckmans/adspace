@@ -1,0 +1,26 @@
+Building AdChart:
+
+debian machines should run ./configure to install project dependencies
+java is also a dependency, and is not installed by the configure script
+
+
+AdChart Binaries:
+
+see commandline options adbot and url-injector
+
+bin/selenium-server launches the virtual browser used by adbot
+bin/url-injector pushes urls onto the Amazon SQS queue
+bin/adbot pops urls off the Amazon SQS queue and processes them using the selenium server
+bin/view-current-matches inserts an SQS message telling the adbot to process the current match data and generate a webpage
+
+
+Running AdChart:
+
+1. launch an instance of selenium-server
+2. launch adbot, pointing it at the selenium server
+3. inject some urls using url-injector
+4. after a adbot has processed some urls, run view-current-matches
+
+
+
+

@@ -1,2 +1,0 @@
-#!/bin/bash
-./adscan -u ../examples/urls.txt -a ../data/global-competitor-list -v -r 3 -c InnoTech
