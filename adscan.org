@@ -47,6 +47,11 @@
 
 
 
+
+* calendar
+** TODO meeting with VC strategy board, toronto                   :IMPORTANT:
+   DEADLINE: <2010-06-10 Thu 14:00>
+
 * TODO migrate statsempire passwords to a new pwsafe file
 * TODO when a known adserver is detected, but there is no match or the adserver anonymizes, have selenium check if the target landing page is a match
 ** use case: doubleclick anonymizes all ads
@@ -61,6 +66,8 @@
 * TODO project dependencies script (install ruby, gems, selenium client etc)
 * TODO screenshots, verify if Xvfb is breaking them
 ** local Xvfb produces black screenshots, too
+
+
 
 * ad serving notes
 ** formatting
