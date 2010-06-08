@@ -35,6 +35,8 @@
 
 
 * calendar
+** TODO extreme VC downtown toronto, 3:30pm - 4:30pm              :IMPORTANT:
+   DEADLINE: <2010-06-14 Mon 15:30>
 ** TODO meeting with VC strategy board, toronto                   :IMPORTANT:
    DEADLINE: <2010-06-10 Thu 14:00>
 * TODO logger/logfile that also works for distributed system
