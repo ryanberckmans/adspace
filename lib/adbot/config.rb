@@ -1,7 +1,9 @@
+require 'set'
+
 module AdBot
 
   class << self
-  
+    
     private
     
     def valid( entry )
@@ -13,9 +15,9 @@ module AdBot
     public
     
     def get_scans( scan_file )
-      scans = []
-      File.foreach( scan_file ) { |scan| scans.push( scan.chomp ) if valid(scan) }
-      scans
+      scans = Set.new
+      File.foreach( scan_file ) { |scan| scans.add( scan.chomp ) if valid(scan) }
+      scans.to_a.sort
     end
   end
 end

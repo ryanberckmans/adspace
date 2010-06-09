@@ -74,58 +74,67 @@ module Adbot
     def scan_url( url, scans, options, scans_with_match )
       
       puts "scanning #{url}" if options.verbose
-      
+
       u = decompose url
       return unless u
       domain = u.domain
       path = u.path
       path ||= "/"
       u = nil # not intended to be used again
+
+      url_result = OpenStruct.new
+      url_result.url = url
+      url_result.domain = domain
+      url_result.path = path
       
-      options.repeat.times do |i|
+      begin
+        browser = SeleniumInterface::browser( domain, options.selenium_host )
+        html = SeleniumInterface::get_page_source( browser, path )
         
-        begin
-          browser = SeleniumInterface::browser( domain, options.selenium_host )
-          html = SeleniumInterface::get_page_source( browser, path )
+        next unless browser and html
+
+        url_result.html = html
+        
+        scans.each do |scan|
+          next unless matches = search_html_for_matches( html, scan )
+
+          url_result.screenshot = SeleniumInterface::page_screenshot browser
+          url_result.matches = matches
           
-          next unless browser and html
+          # add current scan to list of scans that have at least one match across all runs/urls
+          scans_with_match[scan] ||= OpenStruct.new
+          scan_result = scans_with_match[scan]
           
-          scans.each do |scan|
-            next unless matches = search_html_for_matches( html, scan )
-            
-            # add current scan to list of scans that have at least one match across all runs/urls
-            scans_with_match[scan] ||= OpenStruct.new
-            scan_result = scans_with_match[scan]
-            
-            # add current browser page to set of pages containing a match for the current scan
-            scan_result.pages ||= {}
-            scan_result.pages[md5(html)] ||= OpenStruct.new
-            page = scan_result.pages[md5(html)]
-            page.html = html
-            page.screenshot = SeleniumInterface::page_screenshot( browser )
-            page.url = url
-            
-            # add each match on the current browser page to the set of all matches for the scan
-            # annotate the matches found with page md5, to associate matches with screenshots
-            matches.each do |match|
-              match.page_md5 = md5(html)
-              match.url = url
-            end
-            scan_result.matches ||= []
-            scan_result.matches = scan_result.matches + matches
-            
-          end # scans.each
-        ensure
-          begin
-            SeleniumInterface::close browser
-          rescue Exception => e
-            puts e.message
-            puts "error closing browser"
+          # add current browser page to set of pages containing a match for the current scan
+          scan_result.pages ||= {}
+          scan_result.pages[md5(html)] ||= OpenStruct.new
+          page = scan_result.pages[md5(html)]
+          page.html = html
+          page.screenshot = SeleniumInterface::page_screenshot browser 
+          page.url = url
+          
+          # add each match on the current browser page to the set of all matches for the scan
+          # annotate the matches found with page md5, to associate matches with screenshots
+          matches.each do |match|
+            match.page_md5 = md5(html)
+            match.url = url
           end
+          scan_result.matches ||= []
+          scan_result.matches = scan_result.matches + matches
+          
+        end # scans.each
+      rescue Exception => e
+        url_result.error_scanning = true
+      ensure
+        begin
+          SeleniumInterface::close browser
+        rescue Exception => e
+          puts e.message
+          puts "error closing browser"
         end
-        
-        puts "done run #{i+1} of #{options.repeat} for #{url}" if options.verbose and options.repeat > 1
-      end # options.repeat.times
-    end
+      end # begin/rescue/ensure block
+      
+      url_result
+    end # def scan_url
   end
 end

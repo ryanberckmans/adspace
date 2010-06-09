@@ -1,8 +1,9 @@
 require "core/util.rb"
 require File.here "commandline-options.rb"
-require File.here "load-data.rb"
+require File.here "config.rb"
 require File.here "scan.rb"
 require File.here "process-matches.rb"
+require File.here "database.rb"
 
 module Adbot
 
@@ -50,8 +51,18 @@ module Adbot
         end
         
         sleep POLL_FREQUENCY and next unless url_message
-        
-        Adbot::scan_url( url_message.to_s, scans, options, scans_with_match )
+
+        options.repeat.times do |i|
+          url_result = Adbot::scan_url( url_message.to_s, scans, options, scans_with_match )
+
+          if not url_result
+            puts "scan failed for url #{url_message.to_s}"
+            break
+          end
+          
+          Adbot::save_url( url_result, options ) unless not url_result
+          puts "done run #{i+1} of #{options.repeat} for #{url_message.to_s}" if options.verbose and options.repeat > 1
+        end
         
         AWS::SQS::done_with_next_url url_message
       end

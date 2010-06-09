@@ -12,7 +12,7 @@ module AWS
 
     URL_QUEUE = "url-queue"
     PROCESS_MATCHES_QUEUE = "process-matches"
-    URL_QUEUE_VISIBILITY = 120 # seconds
+    URL_QUEUE_VISIBILITY = 180 # seconds
     PROCESS_MATCHES = "process-matches"
     
     class << self
