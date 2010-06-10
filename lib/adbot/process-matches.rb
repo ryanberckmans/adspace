@@ -6,31 +6,26 @@ module Adbot
   class << self
     
     private
-    
-    def summary( scans_with_match, options )
-      puts 
-      puts "--------------------------"
-      puts "summary:"
-      puts " (search performed for #{options.human_client})"
-      puts "-------"
-      
-      scans_with_match.keys.sort.each do |scan|
-        puts "  #{scan} advertises on:"
-        
-        scan_result = scans_with_match[scan]
-        
-        urls = Set.new
-        
-        scan_result.matches.each do
-          |match|
-          urls.add "#{match.url} (adserver #{match.adserver})"
-        end
-        
-        urls.sort.each do
-          |url|
-          puts "    #{url}"
-        end
+
+    def summary_text( url_results )
+      urls = Set.new
+      target_locations = Set.new
+      results = 0
+      ads = 0
+
+      url_results.each do |url_result|
+        next if url_result.error_scanning
+        urls.add url_result.domain
+        results += 1
+        ads += url_result.ads.length
+        url_result.ads.each { |ad| target_locations.add ad.target_location if ad.target_location }
       end
+
+      "AdChart acquired intelligence on #{ads} advertisements leading to #{target_locations.length} target locations on #{results} passes over #{urls.length} urls"
+    end
+    
+    def summary( url_results, options )
+      puts summary_text url_results
     end
     
     def make_client_directories( options )
@@ -45,52 +40,61 @@ module Adbot
       end
     end
     
-    def make_webpage( scans_with_match, options )
+    def make_webpage( url_results, options )
       puts
       puts "saving match data to client subdirectory ../client/#{options.human_client}"
       
       make_client_directories options
+
+      results_by_target_domain = {}
       
+      url_results.each do |url_result|
+        next if url_result.error_scanning or not url_result.ads
+        url_result.ads.each do |ad|
+          next unless ad.target_location
+          u = Util::decompose_url ad.target_location
+          next unless u
+          target_domain = u.domain
+          u = nil # not intended to be used agan
+
+          ad.url = url_result.url
+          
+          results_by_target_domain[target_domain] ||= []
+          results_by_target_domain[target_domain].push ad
+        end
+      end
+
       begin
         File.open("../client/#{options.human_client}/index.html", 'w') do |f|
           
-          f.write "<html><head><title>AdChart results for #{options.human_client}</title><link rel=\"stylesheet\" type=\"text/css\" href=\"../web/styles.css\"></head><body>"
+          f.write "<html><head><title>AdChart</title><link rel=\"stylesheet\" type=\"text/css\" href=\"../web/styles.css\"></head><body>"
           
           f.write "<div id=\"header\"><div class=\"content\"> </div> </div>"
           f.write "<div id=\"container\">"
-          
-          scans_with_match.keys.sort.each do |scan|
-            f.write "<h2>#{scan} advertisements</h2>"
-            
-            scan_result = scans_with_match[scan]
-            
-            urls = {}
-            
-            scan_result.matches.each do |match|
-              urls[match.url] = [] unless urls[match.url]
-              urls[match.url].push match
+
+          f.write "<h2>#{summary_text url_results}</h2>"
+
+          f.write "<div class=\"ad-list\">"
+
+          results_by_target_domain.each_key do |target_domain|
+            f.write "<div class=\"ad-detail-container\">"
+            f.write "<h3>advertisements by #{target_domain}:</h3>"
+
+            unique_inner_html = Set.new
+            results_by_target_domain[target_domain].each do |ad|
+              next unless not unique_inner_html.include? ad.inner_html
+              unique_inner_html.add ad.inner_html
+              
+              f.write "<div class=\"ad-detail\">"
+              f.write "  <a href=\"#{ad.target_location}\" target=\"_blank\"> #{ad.inner_html} </a>"
+              f.write "  <p>on page <b>#{ad.url}</b>, served by #{ad.adserver}</p>"
+              f.write "</div>"
             end
-            
-            urls.each_key do
-              |url|
-              
-              f.write "<div class=\"ad-list\">"
-              f.write "<h3>#{url}:</h3>"
-              
-              unique_inner_html = Set.new
-              
-              urls[url].each do |match|
-                next unless not unique_inner_html.include? match.inner_html
-                unique_inner_html.add match.inner_html
-                
-                f.write "<div class=\"ad-detail\">"
-                f.write "  <a href=\"#{match.link_url}\" target=\"_blank\"> #{match.inner_html} </a>"
-                f.write "  <p>(#{match.adserver})</p>"
-                f.write "</div>"
-              end
-              f.write "</div>" # ad-list
-            end # urls.each_key
-          end # each competitor
+
+            f.write "</div>"
+          end
+
+          f.write "</div>" # ad-list
           
           f.write "</div>" # container
           f.write "</body></html>"
@@ -105,18 +109,18 @@ module Adbot
 
     public
     
-    def process_matches( scans_with_match, options )
-      
-      puts "processing matches..." if options.verbose
+    def process_matches( url_results, options )
 
-      if scans_with_match.empty? then
-        puts "no matches found"
-        return
+      puts "processing matches..."
+
+      begin
+        make_webpage( url_results, options )
+        summary( url_results, options )
+      rescue Exception => e
+        puts e.backtrace
+        puts e.message
+        puts "error processing matches"
       end
-      
-      make_webpage( scans_with_match, options )
-
-      summary( scans_with_match, options )
     end
   end
 end 

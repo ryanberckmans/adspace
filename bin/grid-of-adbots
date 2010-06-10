@@ -1,0 +1,9 @@
+#!/bin/bash
+
+./zr1-ssh-tunnel rberckmans 4000&
+./zr1-ssh-tunnel rberckmans 4001&
+./adbot --selenium-port 4000&
+./adbot --selenium-port 4001&
+./adbot&
+./adbot&
+echo "$0: started four adbots, two on zr1, two on localhost"

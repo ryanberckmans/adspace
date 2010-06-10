@@ -7,17 +7,23 @@ require Util.here "database.rb"
 
 module Adbot
 
-  POLL_FREQUENCY = 20 # seconds
+  BASE_POLL_FREQUENCY = 2 # seconds
+  MAX_BACKOFF = 4 # adbot will not sleep longer than BASE_POLL_FREQUENCY * 2**MAX_BACKOFF
   
   class << self
+
+    def sleep_time( consecutive_sleeps )
+      BASE_POLL_FREQUENCY * 2 ** consecutive_sleeps
+    end
     
     def run
       
       options = Adbot::parse_options( ARGV )
       
       abort unless options
-      
-      scans = AdBot::get_scans options.scan_file
+
+      scans = []
+      scans += AdBot::get_scans options.scan_file if options.scan_file
       
       if options.verbose then
         puts "this scan being performed for client: " + options.human_client
@@ -38,29 +44,42 @@ module Adbot
       
       require "core/sqs-interface.rb"
       
-      scans_with_match = {}
-      
+      url_results = []
+
+      consecutive_sleeps = 0
       loop do
 
-        Adbot::process_matches( scans_with_match, options ) if AWS::SQS::process_matches?
+        if cmd = AWS::SQS::command?
+          Adbot::process_matches( url_results, options ) if cmd == AWS::SQS::PROCESS_MATCHES
+          abort "received shutdown command" if cmd == AWS::SQS::SHUTDOWN
+        end
         
         begin
           url_message = AWS::SQS::next_url
         rescue Exception => e
           url_message = nil
         end
-        
-        sleep POLL_FREQUENCY and next unless url_message
+
+        if not url_message
+          time = sleep_time consecutive_sleeps
+          consecutive_sleeps += 1 unless consecutive_sleeps == MAX_BACKOFF
+          puts "sleeping for #{time} seconds" if options.verbose
+          sleep time and next
+        else
+          consecutive_sleeps = 0
+        end
 
         options.repeat.times do |i|
-          url_result = Adbot::scan_url( url_message.to_s, scans, options, scans_with_match )
+          url_result = Adbot::scan_url( url_message.to_s, scans, options )
 
-          if not url_result
-            puts "scan failed for url #{url_message.to_s}"
+          if not url_result or url_result.error_scanning
+            puts "scan failed for url #{url_message.to_s}" if options.verbose
             break
           end
-          
-          Adbot::save_url( url_result, options ) unless not url_result
+
+          url_results << url_result
+          Adbot::save_url( url_result, options )
+
           puts "done run #{i+1} of #{options.repeat} for #{url_message.to_s}" if options.verbose and options.repeat > 1
         end
         

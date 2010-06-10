@@ -1,3 +1,24 @@
 #!/bin/bash 
 # usage: server-tunnel zr1-username
-ssh -NTL *:4444:zr1.ath.cx:4444 $1@zr1.ath.cx
+
+if [ $# -lt 1 -o $# -gt 3 ] ; then
+    echo "usage: $0 zr1-username localport zr1-remoteport"
+    exit
+fi
+
+REMOTE_PORT=4444
+LOCAL_PORT=4444
+USERNAME=$1
+
+if [ $# -eq 2 ] ; then
+    USERNAME=$1
+    LOCAL_PORT=$2
+fi
+
+if [ $# -eq 3 ] ; then
+    USERNAME=$1
+    LOCAL_PORT=$2
+    REMOTE_PORT=$3
+fi
+
+ssh -NTL *:$LOCAL_PORT:zr1.ath.cx:$REMOTE_PORT $1@zr1.ath.cx

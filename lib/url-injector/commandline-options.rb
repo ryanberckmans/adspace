@@ -6,13 +6,24 @@ module UrlInjector
     def parse_options( argv )
       collected_options = OpenStruct.new
 
+      collected_options.repeat = 1
+      collected_options.urls = []
+
       opts = OptionParser.new do |opts|
         opts.banner = "Usage: url-injector [options]"
         opts.separator ""
         opts.separator "Specific options:"
         
-        opts.on("-u", "--url-file FILE", String, "Required. Path to FILE containing a list of URLs to scan, one per line") do |file|
+        opts.on("-u", "--url-file FILE", String, "Optional. Path to FILE containing a list of URLs to inject, one per line") do |file|
           collected_options.url_file = file
+        end
+
+        opts.on("--url URL", String, "Optional. Inject URL. Use --url any number of times. Each URL must be prefixed with transport protocol (i.e. http://)") do |url|
+          collected_options.urls.push url
+        end
+
+        opts.on("-r", "--repeat-num-times INT", Integer, "Optional. Integer specifying how many times to inject each url (default 1)") do |repeat|
+          collected_options.repeat = repeat
         end
 
         opts.on("-v", "--verbose", "Optional. Verbose mode") do
@@ -38,13 +49,6 @@ module UrlInjector
         return
       end
       
-      if not collected_options.url_file
-        puts "missing required option: --url-file"
-        puts
-        puts opts
-        return
-      end
-
       collected_options
     end
   end

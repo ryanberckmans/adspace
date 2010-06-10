@@ -1,0 +1,3 @@
+[submodule "lib/adabase"]
+	path = lib/adabase
+	url = git@github.com:elucid/adabase.git

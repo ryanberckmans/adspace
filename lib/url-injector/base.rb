@@ -9,11 +9,11 @@ module UrlInjector
 
       abort unless options
 
-      urls = get_u_r_ls( options.url_file )
+      options.urls += get_urls( options.url_file ) unless not options.url_file
 
       if options.verbose then
-        puts "urls to be injected into scanner (found #{urls.length}):"
-        urls.each { |url| puts " " + url }
+        puts "urls to be injected into scanner (found #{options.urls.length}):"
+        options.urls.each { |url| puts " " + url }
       end
 
       if options.bail then
@@ -23,10 +23,14 @@ module UrlInjector
 
       require "core/sqs-interface.rb"
 
-      urls.each do
+      abort "no urls to inject" unless options.urls.length > 0
+
+      options.urls.each do
         |url|
-        AWS::SQS::push_url url
-        puts "injected " + url if options.verbose
+        options.repeat.times do 
+          AWS::SQS::push_url url
+          puts "injected " + url if options.verbose
+        end
       end
 
       puts "done"

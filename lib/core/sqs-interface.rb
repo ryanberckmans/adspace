@@ -3,6 +3,8 @@ require "rubygems"
 require "right_aws"
 require Util.here "aws-interface.rb"
 
+Rightscale::HttpConnection::params = { :http_connection_retry_delay=>5, :http_connection_retry_count=>3, :http_connection_open_timeout=>5, :http_connection_read_timeout=>1200}
+
 module AWS
   module SQS
     # SQS semantic notes:
@@ -11,9 +13,11 @@ module AWS
     #   it is our responsibility to handle redundant/duplicate messages
 
     URL_QUEUE = "url-queue"
-    PROCESS_MATCHES_QUEUE = "process-matches"
+    COMMAND_QUEUE = "command-queue"
     URL_QUEUE_VISIBILITY = 180 # seconds
+
     PROCESS_MATCHES = "process-matches"
+    SHUTDOWN = "shutdown"
     
     class << self
 
@@ -33,33 +37,46 @@ module AWS
         raise
       end
 
-      # process_matches_queue should be a publish/subscribe slots/signals implementation using AWS::SimpleNotificationService, but no ruby SNS client atm
+      # command_queue should be a publish/subscribe slots/signals implementation using AWS::SimpleNotificationService, but no ruby SNS client atm
       begin
-        @@process_matches_queue = @@sqs.queue(PROCESS_MATCHES_QUEUE)
+        @@command_queue = @@sqs.queue(COMMAND_QUEUE)
       rescue Exception => e
         puts e.message
-        puts "error creating/retrieving process-matches queue"
+        puts "error creating/retrieving #{COMMAND_QUEUE} queue"
         raise
       end
 
       def clear
         @@url_queue.delete
-        @@process_matches_queue.delete
+        @@command_queue.delete
         # helper method for testing, does not recreate the queues, so the module cannot be used after calling this method
       end
 
       def process_matches
         begin
-          @@process_matches_queue.push PROCESS_MATCHES
-        rescue Exception =>e 
+          @@command_queue.push PROCESS_MATCHES
+        rescue Exception =>e
+          puts e.backtrace
           puts e.message
           raise
         end
       end
 
-      def process_matches?
+      def shutdown
         begin
-          @@process_matches_queue.pop
+          @@command_queue.push SHUTDOWN
+        rescue Exception =>e
+          puts e.backtrace
+          puts e.message
+          raise
+        end
+      end
+
+      def command?
+        begin
+          m = @@command_queue.pop
+          m = m.to_s if m
+          m
         rescue Exception =>e 
           puts e.message
           nil

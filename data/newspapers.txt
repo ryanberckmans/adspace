@@ -1,0 +1,13 @@
+http://thestar.com
+http://www.theglobeandmail.com/
+# http://www.calgaryherald.com/
+# http://www.edmontonjournal.com/
+# http://www.montrealgazette.com/
+# http://www.ottawacitizen.com/
+# http://www.vancouversun.com/
+# http://www.agoracosmopolitan.com/
+http://www.cbc.ca/
+# http://www.canadianbusiness.com/
+# http://www.macleans.ca/
+# http://www.westernstandard.ca/
+http://www.nationalpost.com/

@@ -1,81 +1,38 @@
 require "date"
-require "core/selenium-interface.rb"
 require "core/util.rb"
+require Util.here "selenium-interface.rb"
+require Util.here "html-parser.rb"
 
 module Adbot
   class << self
     
     private
-    
-    class Adserver
-      MATCH_FOUND_BUT_NO_ADSERVER_DETECTED = "no adserver"
-      COMMINDO_MEDIA="commindo-media.de"
-    end
-    
-    def inner_html_is_match( inner_html, scan )
-      if inner_html =~ /#{scan}/i
-        return Adserver::MATCH_FOUND_BUT_NO_ADSERVER_DETECTED
+    def follow_ad_link_urls( ads, browser )
+      ads.each do |ad|
+        begin
+          ad.target_location = SeleniumInterface::get_link_target_location( browser, ad.link_url ) 
+        rescue Exception => e
+          puts e.backtrace
+          puts e.message
+          puts "error getting ad target location, continuing scan"
+        end
       end
-      false
     end
-    
-    def link_url_is_match( link_url, scan )
-      # link_is_match both:
-      #  i) determines if a match exists for the competitor denoted by 'scan'
-      # ii) returns the adserver serving the ad 
-      
-      if link_url =~ /.*commindo-media.*oadest.*#{scan}/ then
-        return Adserver::COMMINDO_MEDIA
-      elsif link_url =~ /#{scan}/i
-        return Adserver::MATCH_FOUND_BUT_NO_ADSERVER_DETECTED
+
+    def ad_screenshot_info( ads, browser )
+      SeleniumInterface::include_browser_util browser
+      ads.each do |ad|
+        next unless ad.link_url
+        ad.screenshot_info = SeleniumInterface::ad_screenshot_info( browser, "a[href='#{ad.link_url}']" )
       end
-      
-      false
-    end
-    
-    def search_html_for_matches( html, scan )
-      
-      matches = []
-      
-      html.scan(/<a.*?\/a>/i) do
-        |link|
-        
-        re = /<a.*?href="(.*?)".*?>(.*)<.*?\/a>/i
-        m = re.match(link)
-        next unless m
-        link_url = m[1]
-        inner_html = m[2]
-        m = nil # not intended to be used again
-        
-        next unless adserver = link_url_is_match( link_url, scan ) || inner_html_is_match( inner_html, scan )
-        
-        match = OpenStruct.new
-        match.link_url = link_url
-        match.inner_html = inner_html
-        match.adserver = adserver
-        
-        matches.push match
-      end
-      
-      return matches unless matches.empty?
-      false
-    end
-    
-    def decompose( url )
-      url.sub!( /%2F/i, "/" )
-      re = /^(.*?\/\/.*?)(\/.*)?$/i
-      m = re.match(url)
-      return unless m
-      OpenStruct.new( { "domain" => m[1], "path" => m[2] } )
     end
     
     public
-    
-    def scan_url( url, scans, options, scans_with_match )
+    def scan_url( url, scans, options )
       
       puts "scanning #{url}" if options.verbose
 
-      u = decompose url
+      u = Util::decompose_url url
       return unless u
       domain = u.domain
       path = u.path
@@ -88,51 +45,31 @@ module Adbot
       url_result.path = path
       
       begin
-        browser = SeleniumInterface::browser( domain, options.selenium_host )
+        browser = SeleniumInterface::browser( domain, options.selenium_host, options.selenium_port )
         html = SeleniumInterface::get_page_source( browser, path )
-        
-        next unless browser and html
 
+        return url_result unless browser and html
+
+        html = Util::unescape_html html
         url_result.html = html
-        
-        scans.each do |scan|
-          next unless matches = search_html_for_matches( html, scan )
 
-          url_result.screenshot = SeleniumInterface::page_screenshot browser
-          url_result.matches = matches
-          
-          # add current scan to list of scans that have at least one match across all runs/urls
-          scans_with_match[scan] ||= OpenStruct.new
-          scan_result = scans_with_match[scan]
-          
-          # add current browser page to set of pages containing a match for the current scan
-          scan_result.pages ||= {}
-          scan_result.pages[md5(html)] ||= OpenStruct.new
-          page = scan_result.pages[md5(html)]
-          page.html = html
-          page.screenshot = SeleniumInterface::page_screenshot browser 
-          page.url = url
-          
-          # add each match on the current browser page to the set of all matches for the scan
-          # annotate the matches found with page md5, to associate matches with screenshots
-          matches.each do |match|
-            match.page_md5 = md5(html)
-            match.url = url
-          end
-          scan_result.matches ||= []
-          scan_result.matches = scan_result.matches + matches
-          
-        end # scans.each
+        SeleniumInterface::page_screenshot browser
+        url_result.screenshot_s3_key = "stub"
+
+        url_result.ads = Adbot::find_ads html        
+        ad_screenshot_info( url_result.ads, browser )
+        follow_ad_link_urls( url_result.ads, browser )
+
+      rescue Errno::ECONNREFUSED => e
+        puts "connection to selenium server failed"
+        raise
       rescue Exception => e
+        puts e.backtrace
+        puts e.message
         url_result.error_scanning = true
       ensure
-        begin
-          SeleniumInterface::close browser
-        rescue Exception => e
-          puts e.message
-          puts "error closing browser"
-        end
-      end # begin/rescue/ensure block
+        SeleniumInterface::end_session browser
+      end 
       
       url_result
     end # def scan_url

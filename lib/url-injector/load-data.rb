@@ -9,7 +9,7 @@ module UrlInjector
     end
 
     public
-    def get_u_r_ls( url_file )
+    def get_urls( url_file )
       urls = []
       File.foreach( url_file ) { |url| urls.push( url.chomp ) if valid(url) }
       urls
