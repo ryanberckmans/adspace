@@ -1,7 +1,7 @@
 require "core/util.rb"
 require "rubygems"
 require "right_aws"
-require File.here "aws-interface.rb"
+require Util.here "aws-interface.rb"
 
 module AWS
   module SQS

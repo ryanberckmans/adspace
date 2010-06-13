@@ -1,9 +1,9 @@
 require "core/util.rb"
-require File.here "commandline-options.rb"
-require File.here "config.rb"
-require File.here "scan.rb"
-require File.here "process-matches.rb"
-require File.here "database.rb"
+require Util.here "commandline-options.rb"
+require Util.here "config.rb"
+require Util.here "scan.rb"
+require Util.here "process-matches.rb"
+require Util.here "database.rb"
 
 module Adbot
 

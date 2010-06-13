@@ -1,6 +1,6 @@
 require "core/util.rb"
-require File.here "commandline-options.rb"
-require File.here "load-data.rb"
+require Util.here "commandline-options.rb"
+require Util.here "load-data.rb"
 
 module UrlInjector
   class << self
