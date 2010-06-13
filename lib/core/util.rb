@@ -6,7 +6,7 @@ end
 
 class File
   def self.here( string )
-    File.expand_path(File.join(File.dirname(caller[0].split(":")[0]), string))
+    File.expand_path(File.join(File.dirname(__FILE__), string))
   end
 end
 
