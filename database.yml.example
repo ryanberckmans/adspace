@@ -1,0 +1,6 @@
+# copy to database.yml and fill in appropriate connection params
+---
+adapter: sqlite3
+database: /absolute/path/to/database.sqlite3
+pool: 5
+timeout: 5000

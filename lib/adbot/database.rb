@@ -7,8 +7,10 @@ module Adbot
       #  cat lib/adbot/scan.rb | egrep -nC2 "url_result\."
 
       puts "saving url result to database:"
+      s = Scan.from_open_struct url_result
+      s.save
+
       puts url_result if options.verbose
-      
     end
   end
 end
