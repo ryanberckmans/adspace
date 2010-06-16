@@ -6,15 +6,11 @@ module SeleniumInterface
 
   INCLUDE_JQUERY_SCRIPT_FILE = "include-jquery.js"
   BROWSER_UTIL_SCRIPT_FILE = "browser-util.js"
-  
-  f = File.open( Util.here( INCLUDE_JQUERY_SCRIPT_FILE ), "rb")
-  INCLUDE_JQUERY_SCRIPT = f.read
-  f.close
 
-  f = File.open( Util.here( BROWSER_UTIL_SCRIPT_FILE ), "rb")
-  BROWSER_UTIL_SCRIPT = f.read
-  f.close  
-  
+  INCLUDE_JQUERY_SCRIPT = File.read( Util.here( INCLUDE_JQUERY_SCRIPT_FILE ) )
+
+  BROWSER_UTIL_SCRIPT = File.read( Util.here( BROWSER_UTIL_SCRIPT_FILE ) )
+
   class << self
 
     MINI_PAGE_TIMEOUT = 10 # seconds
