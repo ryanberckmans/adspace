@@ -1,17 +1,17 @@
 require 'ostruct'
 require 'digest/md5'
+require 'uri'
 
 module Util
   def self.md5( o )
     Digest::MD5.hexdigest(o)
   end
 
-  def self.decompose_url( url )
-    url = unescape_html url
-    re = /^(.*?\/\/.*?)(\/.*)?$/i
-    m = re.match(url)
-    return unless m
-    OpenStruct.new( { "domain" => m[1], "path" => m[2] } )
+  def self.decompose_url(url)
+    uri = URI.parse(url) rescue OpenStruct.new
+    return unless uri.scheme and uri.host
+    OpenStruct.new("domain" => "#{uri.scheme}://#{uri.host}",
+                   "path" => uri.path)
   end
 
   def self.unescape_html(string)
