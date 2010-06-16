@@ -9,7 +9,7 @@ module UrlInjector
 
       abort unless options
 
-      options.urls += get_urls( options.url_file ) unless not options.url_file
+      options.urls += get_urls( options.url_file ) if options.url_file
 
       if options.verbose then
         puts "urls to be injected into scanner (found #{options.urls.length}):"

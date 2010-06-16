@@ -82,7 +82,7 @@ module Adbot
 
             unique_inner_html = Set.new
             results_by_target_domain[target_domain].each do |ad|
-              next unless not unique_inner_html.include? ad.inner_html
+              next if unique_inner_html.include? ad.inner_html
               unique_inner_html.add ad.inner_html
               
               f.write "<div class=\"ad-detail\">"
