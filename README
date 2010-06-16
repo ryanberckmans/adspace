@@ -16,6 +16,9 @@ bin/view-current-matches inserts an SQS message telling the adbot to process the
 
 Running AdChart:
 
+0. set up database.yml
+0. set up sqs.yml
+
 1. launch an instance of selenium-server
 2. launch adbot, pointing it at the selenium server
 3. inject some urls using url-injector

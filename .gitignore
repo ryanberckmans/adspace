@@ -1,3 +1,5 @@
 db/*
 database.yml
+sqs.yml
+adchart.org
 *~

@@ -1,0 +1,4 @@
+# copy to sqs.yml and fill in appropriate params
+---
+url_queue: yourname-url-queue
+command_queue: yourname-command-queue
