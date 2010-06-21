@@ -53,8 +53,7 @@ module Adbot
         html = Util::unescape_html html
         url_result.html = html
 
-        SeleniumInterface::page_screenshot browser
-        url_result.screenshot_s3_key = "stub"
+        url_result.screenshot = SeleniumInterface::page_screenshot browser
 
         url_result.ads = Adbot::find_ads html        
         ad_screenshot_info( url_result.ads, browser )

@@ -95,7 +95,7 @@ module SeleniumInterface
     end
 
     def page_screenshot( browser )
-      browser.capture_entire_page_screenshot("/tmp/screen.png", "")
+      browser.capture_entire_page_screenshot_to_string("") rescue nil
     end
   end
 end
