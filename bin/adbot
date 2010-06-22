@@ -12,6 +12,7 @@ require 'yaml'
 require 'adabase/app/models/scan.rb'
 require 'adabase/app/models/ad.rb'
 require 'adabase/app/models/screenshot.rb'
+require 'adabase/app/models/ad_image.rb'
 
 s3 = RightAws::S3.new(File.read('../aws/access-key').strip,
                       File.read('../aws/secret-access-key').strip)
