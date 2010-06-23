@@ -85,13 +85,18 @@ module SeleniumInterface
     end
 
     def ad_screenshot_info( browser, jquery_selector )
-      browser.get_eval("this.browserbot.getUserWindow().adbot.set_ad_screenshot_info(\"#{jquery_selector}\");")
-      info = OpenStruct.new
-      info.left = browser.get_eval("this.browserbot.getUserWindow().adbot.ad_screenshot.left");
-      info.top = browser.get_eval("this.browserbot.getUserWindow().adbot.ad_screenshot.top");
-      info.width = browser.get_eval("this.browserbot.getUserWindow().adbot.ad_screenshot.width");
-      info.height = browser.get_eval("this.browserbot.getUserWindow().adbot.ad_screenshot.height");
-      info
+      begin
+        browser.get_eval("this.browserbot.getUserWindow().adbot.set_ad_screenshot_info(\"#{jquery_selector}\");")
+        info = OpenStruct.new
+        info.left = browser.get_eval("this.browserbot.getUserWindow().adbot.ad_screenshot.left")
+        info.top = browser.get_eval("this.browserbot.getUserWindow().adbot.ad_screenshot.top")
+        info.width = browser.get_eval("this.browserbot.getUserWindow().adbot.ad_screenshot.width")
+        info.height = browser.get_eval("this.browserbot.getUserWindow().adbot.ad_screenshot.height")
+      rescue
+        OpenStruct.new
+      else
+        info
+      end
     end
 
     def page_screenshot( browser )
