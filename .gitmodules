@@ -1,4 +1,4 @@
 [submodule "lib/adabase"]
 	path = lib/adabase
-	url = git@github.com:ryanberckmans/adspace.git
+	url = git@github.com:ryanberckmans/adabase.git
 
