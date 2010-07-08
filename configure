@@ -5,6 +5,9 @@ if [ "`uname`" != "Linux" ]; then
     exit
 fi
 
-sudo aptitude install ruby rubygems irb xvfb openssh-client google-chrome-beta libopenssl-ruby sqlite3 ruby1.8-dev libsqlite3-dev
+sudo aptitude install ruby rubygems irb xvfb openssh-client google-chrome-beta libopenssl-ruby sqlite3 ruby1.8-dev libsqlite3-dev subversion
 sudo gem install selenium-client right_aws activerecord sqlite3-ruby
+svn checkout http://closure-library.googlecode.com/svn/trunk/ lib/closure-library
+
+
 
