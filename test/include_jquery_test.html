@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <script src="../lib/closure-library/closure/goog/base.js"></script>
+    <script src="../lib/adbot/include-jquery.js"></script>
+    <script>
+      goog.require('goog.testing.jsunit');
+    </script>
+  </head>
+  <body>
+    <script>
+      function sleep(millis) { // synchronous sleep
+        var date = new Date();
+        var curDate = null;
+        do { curDate = new Date(); }
+        while(curDate-date < millis);
+      }
+                           
+      function testADBOTjQuery() {
+        sleep( 1000 );
+        assertNotNull( ADBOTjQuery );
+                             
+      }
+    </script>
+  </body>
+</html>
