@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <script src="../lib/closure-library/closure/goog/base.js"></script>
+    <script src="../lib/adbot/include-jquery.js"></script>
+    <script src="../lib/adbot/browser-util.js"></script>
+    <script>
+      goog.require('goog.testing.jsunit');
+      goog.require('goog.events.EventTarget');
+    </script>
+  </head>
+  <body>
+    <script>
+    
+function testEventHandling() {
+    var et = new goog.events.EventTarget;
+    var q = 0;
+    function f(e) {
+        q += 1;
+    }
+    et.addEventListener("foo", f );
+    et.dispatchEvent("foo");
+    assertEquals( 1, q );
+}
+
+function testAdClass() {
+    assertNotEquals( adbot.ad_class, "none");
+}
+
+</script>
+  </body>
+</html>
