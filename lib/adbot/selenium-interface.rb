@@ -79,8 +79,9 @@ module SeleniumInterface
       browser.open_window( link_url, "link-url-window" )
       browser.select_window "link-url-window"
       handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
+      location = browser.location
       browser.select_window( nil ) # reselect main window
-      browser.location
+      location
     end
 
     def include_jquery( browser )
