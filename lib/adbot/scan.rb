@@ -2,7 +2,6 @@ require "date"
 require 'base64'
 require "core/util.rb"
 require Util.here "selenium-interface.rb"
-require Util.here "html-parser.rb"
 
 module Adbot
   class << self
@@ -47,17 +46,21 @@ module Adbot
       
       begin
         browser = SeleniumInterface::browser( domain, options.selenium_host, options.selenium_port )
-        html = SeleniumInterface::get_page_source( browser, path )
+        raise unless browser
+        
+        SeleniumInterface::open_page browser
 
-        return url_result unless browser and html
+        html = SeleniumInterface::get_page_source browser
+        raise unless html
 
         html = Util::unescape_html html
         url_result.html = html
 
+        SeleniumInterface::highlight_ads browser
+
         url_result.screenshot = SeleniumInterface::page_screenshot browser
         File.open("/tmp/#{url_result.domain.split("//")[1]}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))}
 
-        #url_result.ads = Adbot::find_ads html        
         #ad_screenshot_info( url_result.ads, browser )
         # follow_ad_link_urls( url_result.ads, browser )
 

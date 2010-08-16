@@ -62,12 +62,17 @@ module SeleniumInterface
       end
     end
 
-    def get_page_source( browser, relative_path  = "/" )
+    def get_page_source( browser )
+      browser.get_html_source
+    end
+
+    def open_page( browser, relative_path  = "/" )
       handle_timeout { browser.open relative_path }
       include_browser_util browser
-      sleep 5
+    end
+
+    def highlight_ads( browser )
       browser.get_eval("this.browserbot.getUserWindow().adbot.highlight_ads();")
-      browser.get_html_source
     end
 
     def get_link_target_location( browser, link_url )
