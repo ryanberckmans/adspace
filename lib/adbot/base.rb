@@ -78,7 +78,7 @@ module Adbot
           end
 
           url_results << url_result
-          Adbot::save_url( url_result, options )
+          #Adbot::save_url( url_result, options )
 
           puts "done run #{i+1} of #{options.repeat} for #{url_message.to_s}" if options.verbose and options.repeat > 1
         end

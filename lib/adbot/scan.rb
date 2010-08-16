@@ -1,4 +1,5 @@
 require "date"
+require 'base64'
 require "core/util.rb"
 require Util.here "selenium-interface.rb"
 require Util.here "html-parser.rb"
@@ -54,10 +55,11 @@ module Adbot
         url_result.html = html
 
         url_result.screenshot = SeleniumInterface::page_screenshot browser
+        File.open("/tmp/#{url_result.domain.split("//")[1]}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))}
 
-        url_result.ads = Adbot::find_ads html        
-        ad_screenshot_info( url_result.ads, browser )
-        follow_ad_link_urls( url_result.ads, browser )
+        #url_result.ads = Adbot::find_ads html        
+        #ad_screenshot_info( url_result.ads, browser )
+        # follow_ad_link_urls( url_result.ads, browser )
 
       rescue Errno::ECONNREFUSED => e
         puts "connection to selenium server failed"

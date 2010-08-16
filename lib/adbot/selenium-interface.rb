@@ -64,6 +64,9 @@ module SeleniumInterface
 
     def get_page_source( browser, relative_path  = "/" )
       handle_timeout { browser.open relative_path }
+      include_browser_util browser
+      sleep 5
+      browser.get_eval("this.browserbot.getUserWindow().adbot.highlight_ads();")
       browser.get_html_source
     end
 
