@@ -15,7 +15,7 @@ module SeleniumInterface
   class << self
 
     MINI_PAGE_TIMEOUT = 10 # seconds
-    PAGE_TIMEOUT = 60 # seconds
+    PAGE_TIMEOUT = 120 # seconds
     DEFAULT_TIMEOUT = 300 # seconds, also used as http read timeout for selenium server connection
 
     MILLIS_IN_SECOND = 1000
@@ -56,7 +56,7 @@ module SeleniumInterface
       rescue Selenium::CommandError => e
         if e.message =~ /Timed out after/
           puts e.message
-          puts "selenium timed out, continuing operation with available data"
+          puts "selenium timed out, attempting to continue operation"
         else
           raise
         end

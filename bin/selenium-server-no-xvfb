@@ -1,3 +1,3 @@
 #!/bin/bash
 
-java -jar ../lib/selenium-server/selenium-server-1.0.3/selenium-server.jar
+java -jar ../lib/selenium-server/selenium-server-1.0.3/selenium-server.jar -firefoxProfileTemplate /home/ryan/.mozilla/firefox/cxf66ksp.dev/
