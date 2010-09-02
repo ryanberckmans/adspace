@@ -47,8 +47,12 @@ module Adbot
       begin
         browser = SeleniumInterface::browser( domain, options.selenium_host, options.selenium_port )
         raise unless browser
-        
-        SeleniumInterface::open_page browser
+
+        if url_result.path.length > 0
+          SeleniumInterface::open_page( browser, url_result.path )
+        else
+          SeleniumInterface::open_page browser
+        end
 
         html = SeleniumInterface::get_page_source browser
         raise unless html
