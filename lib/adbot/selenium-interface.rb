@@ -4,11 +4,11 @@ require "core/util.rb"
 
 module SeleniumInterface
 
-  INCLUDE_JQUERY_SCRIPT_FILE = "include-jquery.js"
+  JQUERY_FILE = "jquery-1.4.2.min.js"
   BROWSER_UTIL_SCRIPT_FILE = "browser-util.js"
 
-  INCLUDE_JQUERY_SCRIPT = File.read( Util.here( INCLUDE_JQUERY_SCRIPT_FILE ) )
-
+  ADBOT_JQUERY_SCRIPT = "ADBOTjQuery = jQuery.noConflict(true);"
+  JQUERY_SCRIPT = File.read( Util.here( JQUERY_FILE ) )
   BROWSER_UTIL_SCRIPT = File.read( Util.here( BROWSER_UTIL_SCRIPT_FILE ) )
 
   class << self
@@ -68,7 +68,6 @@ module SeleniumInterface
 
     def open_page( browser, relative_path  = "/" )
       handle_timeout { browser.open relative_path }
-      include_browser_util browser
     end
 
     def highlight_ads( browser )
@@ -84,12 +83,9 @@ module SeleniumInterface
       location
     end
 
-    def include_jquery( browser )
-      browser.run_script( INCLUDE_JQUERY_SCRIPT )
-    end
-
     def include_browser_util( browser )
-      include_jquery browser
+      browser.run_script( JQUERY_SCRIPT )
+      browser.run_script( ADBOT_JQUERY_SCRIPT )
       browser.run_script( BROWSER_UTIL_SCRIPT )
     end
 

@@ -56,6 +56,7 @@ module Adbot
         html = Util::unescape_html html
         url_result.html = html
 
+        SeleniumInterface::include_browser_util browser
         SeleniumInterface::highlight_ads browser
 
         url_result.screenshot = SeleniumInterface::page_screenshot browser
