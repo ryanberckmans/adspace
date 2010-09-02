@@ -4,10 +4,11 @@ require "core/util.rb"
 
 module SeleniumInterface
 
+  ADBOT_JQUERY_FILE = "adbot-jquery-noconflict.js"
   JQUERY_FILE = "jquery-1.4.2.min.js"
   BROWSER_UTIL_SCRIPT_FILE = "browser-util.js"
 
-  ADBOT_JQUERY_SCRIPT = "ADBOTjQuery = jQuery.noConflict(true);"
+  ADBOT_JQUERY_SCRIPT = File.read( Util.here( ADBOT_JQUERY_FILE ) )
   JQUERY_SCRIPT = File.read( Util.here( JQUERY_FILE ) )
   BROWSER_UTIL_SCRIPT = File.read( Util.here( BROWSER_UTIL_SCRIPT_FILE ) )
 
