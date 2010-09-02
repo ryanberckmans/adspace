@@ -60,7 +60,7 @@ module Adbot
         SeleniumInterface::highlight_ads browser
 
         url_result.screenshot = SeleniumInterface::page_screenshot browser
-        File.open("/tmp/#{url_result.domain.split("//")[1]}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot
+        File.open("/tmp/#{url_result.url.split("//")[1].sub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot
 
         #ad_screenshot_info( url_result.ads, browser )
         # follow_ad_link_urls( url_result.ads, browser )
