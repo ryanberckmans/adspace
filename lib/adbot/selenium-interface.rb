@@ -72,7 +72,9 @@ module SeleniumInterface
     end
 
     def highlight_ads( browser )
-      browser.get_eval("this.browserbot.getUserWindow().adbot.highlight_ads();")
+      browser.get_eval "this.browserbot.getUserWindow().adbot.highlight_ads();"
+      browser.click_at "dom=document.adbot.click", "15,15" rescue nil
+      sleep 500
     end
 
     def get_link_target_location( browser, link_url )
