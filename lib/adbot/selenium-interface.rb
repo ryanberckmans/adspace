@@ -73,7 +73,9 @@ module SeleniumInterface
 
     def highlight_ads( browser )
       browser.get_eval "this.browserbot.getUserWindow().adbot.highlight_ads();"
-      browser.click_at "dom=document.adbot.click", "15,15" rescue nil
+      click_x = browser.get_eval "this.browserbot.getUserWindow().adbot.click_x"
+      click_y = browser.get_eval "this.browserbot.getUserWindow().adbot.click_y"
+      browser.click_at "dom=document.adbot.click", "#{click_x},#{click_y}" rescue nil
       sleep 500
     end
 
