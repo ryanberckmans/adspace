@@ -14,7 +14,7 @@ module SeleniumInterface
 
   class << self
 
-    MINI_PAGE_TIMEOUT = 10 # seconds
+    MINI_PAGE_TIMEOUT = 20 # seconds
     PAGE_TIMEOUT = 120 # seconds
     DEFAULT_TIMEOUT = 300 # seconds, also used as http read timeout for selenium server connection
 
@@ -71,18 +71,20 @@ module SeleniumInterface
       handle_timeout { browser.open relative_path }
     end
 
+    def on( browser, expr )
+      browser.get_eval "this.browserbot.getUserWindow().adbot.#{expr};"
+    end
+
     def highlight_ads( browser )
-      browser.get_eval "this.browserbot.getUserWindow().adbot.highlight_ads();"
-      browser.click "dom=document.adbot.click" rescue nil
-      sleep 500
+      on browser, "highlight_ads()"
     end
 
     def get_link_target_location( browser, link_url )
-      browser.open_window( link_url, "link-url-window" )
+      browser.open_window link_url, "link-url-window"
       browser.select_window "link-url-window"
       handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
       location = browser.location
-      browser.select_window( nil ) # reselect main window
+      browser.select_window nil # reselect main window
       location
     end
 
@@ -92,19 +94,30 @@ module SeleniumInterface
       browser.run_script( BROWSER_UTIL_SCRIPT )
     end
 
-    def ad_screenshot_info( browser, jquery_selector )
-      begin
-        browser.get_eval("this.browserbot.getUserWindow().adbot.set_ad_screenshot_info(\"#{jquery_selector}\");")
-        info = OpenStruct.new
-        info.left = browser.get_eval("this.browserbot.getUserWindow().adbot.ad_screenshot.left")
-        info.top = browser.get_eval("this.browserbot.getUserWindow().adbot.ad_screenshot.top")
-        info.width = browser.get_eval("this.browserbot.getUserWindow().adbot.ad_screenshot.width")
-        info.height = browser.get_eval("this.browserbot.getUserWindow().adbot.ad_screenshot.height")
-      rescue
-        OpenStruct.new
-      else
-        info
+    def get_ads( browser )
+      ads = []
+      
+      on browser, "ad_iterator()"
+
+      while( true )
+        on browser, "next_ad()"
+        break unless (on browser, "is_next_ad") == "true"
+
+        ad = OpenStruct.new
+        ads << ad
+
+        ad.link_url = on browser, "current_ad.link_url"
+        ad.type = on browser, "current_ad.type"
+        ad.screenshot_left = (on browser, "current_ad.screenshot_left").to_f
+        ad.screenshot_top = (on browser, "current_ad.screenshot_top").to_f
+        ad.screenshot_width = (on browser, "current_ad.screenshot_width").to_f
+        ad.screenshot_height = (on browser, "current_ad.screenshot_height").to_f
+        
+        puts "found a next ad in browser:"
+        puts ad
       end
+
+      ads
     end
 
     def page_screenshot( browser )

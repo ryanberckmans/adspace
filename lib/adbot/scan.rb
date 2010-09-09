@@ -61,14 +61,22 @@ module Adbot
         url_result.html = html
 
         SeleniumInterface::include_browser_util browser
+
         SeleniumInterface::highlight_ads browser
 
         url_result.screenshot = SeleniumInterface::page_screenshot browser
         File.open("/tmp/#{url_result.url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue puts "failed to save screenshot"
-        
-        #ad_screenshot_info( url_result.ads, browser )
-        # follow_ad_link_urls( url_result.ads, browser )
 
+        url_result.ads = SeleniumInterface::get_ads browser
+        follow_ad_link_urls( url_result.ads, browser )
+
+        puts "final struct:"
+        url_result.screenshot = nil
+        puts url_result
+        url_result.ads.each { |ad|
+          puts ad.target_location
+        }
+        
       rescue Errno::ECONNREFUSED => e
         puts "connection to selenium server failed"
         raise
