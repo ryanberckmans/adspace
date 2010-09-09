@@ -27,15 +27,9 @@ function testAdClass() {
     assertNotEquals( adbot.ad_class, "none");
 }
 
-function testCollectAds() {
+function testHighlightAds() {
     assertNotNull( ADBOTjQuery );
     adbot.highlight_ads();
-}
-
-function testAdLinks() {
-    assertNotNull( ADBOTjQuery );
-    assertNotUndefined( adbot.ads );
-    assertNotUndefined( adbot.ad_links );
 }
 
     </script>
