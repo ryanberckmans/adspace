@@ -35,14 +35,14 @@ module Adbot
       end
       
       begin
-        FileUtils.mkdir("../client/#{options.human_client}")
+        FileUtils.mkdir("../client/no-client")
       rescue Exception => e
       end
     end
     
     def make_webpage( url_results, options )
       puts
-      puts "saving match data to client subdirectory ../client/#{options.human_client}"
+      puts "saving match data to client subdirectory ../client/no-client"
       
       make_client_directories options
 
@@ -65,7 +65,7 @@ module Adbot
       end
 
       begin
-        File.open("../client/#{options.human_client}/index.html", 'w') do |f|
+        File.open("../client/no-client/index.html", 'w') do |f|
           
           f.write "<html><head><title>AdChart</title><link rel=\"stylesheet\" type=\"text/css\" href=\"../web/styles.css\"></head><body>"
           
@@ -104,7 +104,7 @@ module Adbot
         raise
       end
       
-      system "google-chrome ../client/#{options.human_client}/index.html&"
+      system "google-chrome ../client/no-client/index.html&"
     end
 
     public
@@ -121,6 +121,10 @@ module Adbot
         puts e.message
         puts "error processing matches"
       end
+    end
+
+    def output_json( url_results, options )
+      puts "would output to #{options.output_dir}"
     end
   end
 end 

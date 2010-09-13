@@ -14,7 +14,7 @@ module SeleniumInterface
 
   class << self
 
-    MINI_PAGE_TIMEOUT = 20 # seconds
+    MINI_PAGE_TIMEOUT = 15 # seconds
     PAGE_TIMEOUT = 120 # seconds
     DEFAULT_TIMEOUT = 300 # seconds, also used as http read timeout for selenium server connection
 

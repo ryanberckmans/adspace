@@ -9,45 +9,40 @@ module Adbot
       collected_options = OpenStruct.new
       
       collected_options.repeat = 1
+      collected_options.output_dir = "/tmp/"
       collected_options.selenium_host = "localhost"
       collected_options.selenium_port = 4444
-      collected_options.human_client = "no-client"
       
       opts = OptionParser.new do |opts|
-        opts.banner = "Usage: scanner [options]"
+        opts.banner = "usage: scanner [options]"
         opts.separator ""
-        opts.separator "Specific options:"
+        opts.separator "specific options:"
 
-        opts.on("-a", "--advertisers-file FILE", String, "Optional. Path to FILE containing advertisers to scan each web page for, one per line (each complete line is an advertiser which is scanned for)") do |file|
-          collected_options.scan_file = file
+        opts.on("-o", "--output-directory DIR", String, "optional. output scan data to DIR (default /tmp)") do |dir|
+          collected_options.output_dir = dir
         end
         
-        opts.on("-r", "--repeat-num-times INT", Integer, "Optional. Integer specifying how many times to repeat the scanning process for each url (default 1)") do |repeat|
+        opts.on("-r", "--repeat-num-times INT", Integer, "optional. integer specifying how many times to repeat the scanning process for each url (default 1)") do |repeat|
           collected_options.repeat = repeat
         end
         
-        opts.on("--selenium-host HOST", String, "Optional. Ip address or domain of selenium server (default localhost)") do |host|
+        opts.on("--selenium-host HOST", String, "optional. ip address or domain of selenium server (default localhost)") do |host|
           collected_options.selenium_host = host
         end
 
-        opts.on("--selenium-port PORT", String, "Optional. Port of selenium server (default 4444)") do |port|
+        opts.on("--selenium-port PORT", String, "optional. port of selenium server (default 4444)") do |port|
           collected_options.selenium_port = port
         end
 
-        
-        opts.on("-c", "--client CLIENT", String, "Optional. The human customer the scan is being performed for (default no-client)") do |client|
-          collected_options.human_client = client
-        end    
-        
-        opts.on("-v", "--verbose", "Optional. Verbose mode") do
+        opts.on("-v", "--verbose", "optional. verbose mode") do
           collected_options.verbose = true
         end
         
-        opts.on("-b", "--bail", "Optional. Set everything up but exit instead of connecting to selenium server") do
+        opts.on("-b", "--bail", "optional. read commandline options but exit instead of running adbot") do
           collected_options.bail = true
         end
         
-        opts.on_tail("-h", "--help", "Show this message") do
+        opts.on_tail("-h", "--help", "show this message") do
           puts opts
           exit
         end

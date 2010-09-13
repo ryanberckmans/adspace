@@ -21,16 +21,8 @@ module Adbot
       end
     end
 
-    def ad_screenshot_info( ads, browser )
-      SeleniumInterface::include_browser_util browser
-      ads.each do |ad|
-        next unless ad.link_url
-        ad.screenshot_info = SeleniumInterface::ad_screenshot_info( browser, "a[href='#{ad.link_url}']" )
-      end
-    end
-    
     public
-    def scan_url( url, scans, options )
+    def scan_url( url, options )
       
       puts "scanning #{url}" if options.verbose
 

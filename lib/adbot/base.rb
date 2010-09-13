@@ -1,6 +1,5 @@
 require "core/util.rb"
 require Util.here "commandline-options.rb"
-require Util.here "config.rb"
 require Util.here "scan.rb"
 require Util.here "process-matches.rb"
 require Util.here "database.rb"
@@ -17,24 +16,15 @@ module Adbot
     end
     
     def run
-      
       options = Adbot::parse_options( ARGV )
       
       abort unless options
 
-      scans = []
-      scans += AdBot::get_scans options.scan_file if options.scan_file
-      
       if options.verbose then
-        puts "this scan being performed for client: " + options.human_client
-        
-        puts "selenium server host: " + options.selenium_host
-        puts "selenium server port: 4444"
-        
-        puts "repeating each url #{options.repeat} times"
-        
-        puts "competitors to be sought (found #{scans.length}):"
-        scans.each { |scan| puts " " + scan }
+        puts "selenium server host: #{options.selenium_host}"
+        puts "selenium server port: #{options.selenium_port}"
+        puts "output directory: #{options.output_dir}"
+        puts "repeating each url #{options.repeat} times" if options.repeat > 1
       end
       
       if options.bail then
@@ -50,7 +40,7 @@ module Adbot
       loop do
 
         if cmd = AWS::SQS::command?
-          Adbot::process_matches( url_results, options ) if cmd == AWS::SQS::PROCESS_MATCHES
+          Adbot::output_json( url_results, options ) if cmd == AWS::SQS::PROCESS_MATCHES
           abort "received shutdown command" if cmd == AWS::SQS::SHUTDOWN
         end
         
@@ -70,7 +60,7 @@ module Adbot
         end
 
         options.repeat.times do |i|
-          url_result = Adbot::scan_url( url_message.to_s, scans, options )
+          url_result = Adbot::scan_url( url_message.to_s, options )
 
           if not url_result or url_result.error_scanning
             puts "scan failed for url #{url_message.to_s}" if options.verbose
