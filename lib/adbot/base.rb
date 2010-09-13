@@ -62,7 +62,7 @@ module Adbot
 
         if not url_result or url_result.error_scanning
           puts "scan failed for url #{url_message.to_s}" if options.verbose
-          break
+          next
         end
 
         url_results << url_result
@@ -71,7 +71,7 @@ module Adbot
         #Adbot::save_url( url_result, options )
 
         AWS::SQS::done_with_next_url url_message
-      end
+      end # loop do
     end # def run
   end # class << self
 end # AdBot

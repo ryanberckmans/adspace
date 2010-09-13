@@ -112,9 +112,7 @@ module SeleniumInterface
 
     def get_ads( browser )
       ads = []
-      
       on browser, "ad_iterator()"
-
       while( true )
         on browser, "next_ad()"
         break unless (on browser, "is_next_ad") == "true"
@@ -125,6 +123,7 @@ module SeleniumInterface
         ad.link_url = Util::unescape_html((on browser, "current_ad.link_url"))
         ad.link_url = nil if ad.link_url =~ /\s/ # naively don't allow URIs with whitespace. don't use URI.parse because some adnetworks use invalid URIs
         ad.link_url = nil if ad.link_url.length < 10 # naively don't allow short link_urls
+        ad.link_url = nil if ad.link_url =~ /link-url-not-supported/ # this is what browser-util defaults to
         
         ad.type = on browser, "current_ad.type"
         ad.screenshot_left = (on browser, "current_ad.screenshot_left").to_f
@@ -135,7 +134,6 @@ module SeleniumInterface
         puts "found a next ad in browser:"
         puts ad
       end
-
       ads
     end
 
