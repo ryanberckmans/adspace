@@ -68,9 +68,15 @@ module Adbot
         File.open("/tmp/#{url_result.url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue puts "failed to save screenshot"
 
         url_result.ads = SeleniumInterface::get_ads browser
+        url_result.page_width = SeleniumInterface::page_width browser
+        url_result.page_height = SeleniumInterface::page_height browser
+        url_result.title = SeleniumInterface::page_title browser
+        url_result.date = SeleniumInterface::scan_date browser
+        
         follow_ad_link_urls( url_result.ads, browser )
 
         puts "final struct:"
+        url_result.html = nil
         url_result.screenshot = nil
         puts url_result
         url_result.ads.each { |ad|

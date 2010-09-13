@@ -94,6 +94,22 @@ module SeleniumInterface
       browser.run_script( BROWSER_UTIL_SCRIPT )
     end
 
+    def page_width( browser )
+      on browser, "page_width"
+    end
+
+    def page_height( browser )
+      on browser, "page_height"
+    end
+
+    def page_title( browser )
+      browser.title
+    end
+
+    def scan_date( browser )
+      on browser, "date"
+    end
+
     def get_ads( browser )
       ads = []
       
