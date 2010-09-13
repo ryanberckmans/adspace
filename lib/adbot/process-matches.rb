@@ -8,9 +8,7 @@ require 'core/util.rb'
 class OpenStruct
   # implement OpenStruct::to_json for temporary file output
   def to_json(*a)
-    s = JSON.generate(marshal_dump())
-    puts "made json: #{s}"
-    s
+    JSON.generate(marshal_dump())
   end
 end
 
@@ -146,12 +144,12 @@ module Adbot
     def output_json( url_result, options )
       begin
         file_path = options.output_dir + url_result.url.split("//")[1].gsub("/", ".") + ".txt"
-        puts "writing url_result for #{url_result.url} to #{file_path}" if options.verbose
         f = File.open file_path, "a"
-        to_write = "BEGIN_SCAN"
+        to_write = "BEGIN_SCAN\n"
         to_write += JSON.generate(url_result)
-        to_write += "END_SCAN"
+        to_write += "\nEND_SCAN\n"
         f.write to_write
+        puts "wrote url_result for #{url_result.url} to #{file_path}" if options.verbose
       rescue Exception => e
         puts e.backtrace
         puts e.message

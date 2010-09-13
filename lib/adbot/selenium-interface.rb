@@ -122,7 +122,10 @@ module SeleniumInterface
         ad = OpenStruct.new
         ads << ad
 
-        ad.link_url = URI.parse(Util::unescape_html((on browser, "current_ad.link_url"))).to_s rescue nil
+        ad.link_url = Util::unescape_html((on browser, "current_ad.link_url"))
+        ad.link_url = nil if ad.link_url =~ /\s/ # naively don't allow URIs with whitespace. don't use URI.parse because some adnetworks use invalid URIs
+        ad.link_url = nil if ad.link_url.length < 10 # naively don't allow short link_urls
+        
         ad.type = on browser, "current_ad.type"
         ad.screenshot_left = (on browser, "current_ad.screenshot_left").to_f
         ad.screenshot_top = (on browser, "current_ad.screenshot_top").to_f
