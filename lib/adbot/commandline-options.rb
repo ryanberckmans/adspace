@@ -8,7 +8,6 @@ module Adbot
     def parse_options( argv )
       collected_options = OpenStruct.new
       
-      collected_options.repeat = 1
       collected_options.output_dir = "/tmp/"
       collected_options.selenium_host = "localhost"
       collected_options.selenium_port = 4444
@@ -20,10 +19,6 @@ module Adbot
 
         opts.on("-o", "--output-directory DIR", String, "optional. output scan data to DIR (default /tmp)") do |dir|
           collected_options.output_dir = dir
-        end
-        
-        opts.on("-r", "--repeat-num-times INT", Integer, "optional. integer specifying how many times to repeat the scanning process for each url (default 1)") do |repeat|
-          collected_options.repeat = repeat
         end
         
         opts.on("--selenium-host HOST", String, "optional. ip address or domain of selenium server (default localhost)") do |host|

@@ -1,6 +1,26 @@
+require 'rubygems'
+require 'json/pure'
+require 'active_support'
 require 'base64'
 require 'set'
 require 'core/util.rb'
+
+class OpenStruct
+  # implement OpenStruct::to_json for temporary file output
+  def to_json(*a)
+    s = JSON.generate(marshal_dump())
+    puts "made json: #{s}"
+    s
+  end
+end
+
+# workaround for activesupport vs. json_pure vs. Ruby 1.8 glitch
+# source: http://pivotallabs.com/users/alex/blog/articles/1332-monkey-patch-of-the-day-activesupport-vs-json-pure-vs-ruby-1-8
+if JSON.const_defined?(:Pure)
+  class JSON::Pure::Generator::State
+    include ActiveSupport::CoreExtensions::Hash::Except
+  end
+end
 
 module Adbot
   class << self
@@ -123,8 +143,22 @@ module Adbot
       end
     end
 
-    def output_json( url_results, options )
-      puts "would output to #{options.output_dir}"
+    def output_json( url_result, options )
+      begin
+        file_path = options.output_dir + url_result.url.split("//")[1].gsub("/", ".") + ".txt"
+        puts "writing url_result for #{url_result.url} to #{file_path}" if options.verbose
+        f = File.open file_path, "a"
+        to_write = "BEGIN_SCAN"
+        to_write += JSON.generate(url_result)
+        to_write += "END_SCAN"
+        f.write to_write
+      rescue Exception => e
+        puts e.backtrace
+        puts e.message
+        puts "failed to write json output file for #{url_result.url}"
+      ensure
+        f.close
+      end
     end
   end
 end 

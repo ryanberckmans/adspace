@@ -24,7 +24,6 @@ module Adbot
         puts "selenium server host: #{options.selenium_host}"
         puts "selenium server port: #{options.selenium_port}"
         puts "output directory: #{options.output_dir}"
-        puts "repeating each url #{options.repeat} times" if options.repeat > 1
       end
       
       if options.bail then
@@ -37,8 +36,8 @@ module Adbot
       url_results = []
 
       consecutive_sleeps = 0
-      loop do
 
+      loop do
         if cmd = AWS::SQS::command?
           Adbot::output_json( url_results, options ) if cmd == AWS::SQS::PROCESS_MATCHES
           abort "received shutdown command" if cmd == AWS::SQS::SHUTDOWN
@@ -59,20 +58,18 @@ module Adbot
           consecutive_sleeps = 0
         end
 
-        options.repeat.times do |i|
-          url_result = Adbot::scan_url( url_message.to_s, options )
+        url_result = Adbot::scan_url( url_message.to_s, options )
 
-          if not url_result or url_result.error_scanning
-            puts "scan failed for url #{url_message.to_s}" if options.verbose
-            break
-          end
-
-          url_results << url_result
-          #Adbot::save_url( url_result, options )
-
-          puts "done run #{i+1} of #{options.repeat} for #{url_message.to_s}" if options.verbose and options.repeat > 1
+        if not url_result or url_result.error_scanning
+          puts "scan failed for url #{url_message.to_s}" if options.verbose
+          break
         end
-        
+
+        url_results << url_result
+
+        Adbot::output_json( url_result, options )
+        #Adbot::save_url( url_result, options )
+
         AWS::SQS::done_with_next_url url_message
       end
     end # def run
