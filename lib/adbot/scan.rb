@@ -10,8 +10,10 @@ module Adbot
     def follow_ad_link_urls( ads, browser )
       ads.each do |ad|
         begin
+          raise "ad didn't have link_url to follow" unless ad.link_url
           ad.target_location = SeleniumInterface::get_link_target_location( browser, ad.link_url ) 
         rescue Exception => e
+          ad.target_location = "no-target-location"
           puts e.backtrace
           puts e.message
           puts "error getting ad target location, continuing scan"

@@ -122,7 +122,7 @@ module SeleniumInterface
         ad = OpenStruct.new
         ads << ad
 
-        ad.link_url = Util::unescape_html((on browser, "current_ad.link_url"))
+        ad.link_url = URI.parse(Util::unescape_html((on browser, "current_ad.link_url"))).to_s rescue nil
         ad.type = on browser, "current_ad.type"
         ad.screenshot_left = (on browser, "current_ad.screenshot_left").to_f
         ad.screenshot_top = (on browser, "current_ad.screenshot_top").to_f
