@@ -7,10 +7,11 @@ module Adbot
   class << self
     
     private
-    def follow_ad_link_urls( ads, browser )
+    def follow_ad_link_urls( ads, browser, options )
       ads.each do |ad|
+        (ad.target_location = "not-following-ads" and next) unless options.follow_ads
         begin
-          raise "ad didn't have link_url to follow" unless ad.link_url
+          raise "ad didn't have link_url to follow" unless ad.link_url and ad.link_url.length > 0
           ad.target_location = SeleniumInterface::get_link_target_location( browser, ad.link_url ) 
         rescue Exception => e
           ad.target_location = "no-target-location"
@@ -67,18 +68,24 @@ module Adbot
         url_result.title = SeleniumInterface::page_title browser
         url_result.date = SeleniumInterface::scan_date browser
         
-        follow_ad_link_urls( url_result.ads, browser )
+        follow_ad_link_urls( url_result.ads, browser, options )
 
-        puts "final struct:"
+        Util::quantcast_rank url_result
+
         url_result.html = nil
         url_result.screenshot = nil
-        puts url_result
-        url_result.ads.each { |ad|
-          puts ad.target_location
-        }
+        if options.verbose
+          puts "final struct:"
+          puts url_result
+          url_result.ads.each { |ad|
+            puts ad.target_location
+          }
+        end
         
       rescue Errno::ECONNREFUSED => e
         puts "connection to selenium server failed"
+        raise
+      rescue Interrupt, SystemExit
         raise
       rescue Exception => e
         puts e.backtrace

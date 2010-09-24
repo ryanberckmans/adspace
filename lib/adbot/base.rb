@@ -24,6 +24,7 @@ module Adbot
         puts "selenium server host: #{options.selenium_host}"
         puts "selenium server port: #{options.selenium_port}"
         puts "output directory: #{options.output_dir}"
+        puts "not following ads" unless options.follow_ads
       end
       
       if options.bail then
@@ -45,6 +46,8 @@ module Adbot
         
         begin
           url_message = AWS::SQS::next_url
+        rescue Interrupt, SystemExit
+          raise
         rescue Exception => e
           url_message = nil
         end
@@ -60,15 +63,13 @@ module Adbot
 
         url_result = Adbot::scan_url( url_message.to_s, options )
 
-        if not url_result or url_result.error_scanning
-          puts "scan failed for url #{url_message.to_s}" if options.verbose
-          next
+        if url_result and not url_result.error_scanning
+          url_results << url_result
+          Adbot::output_tabular( url_result, options )
+          #Adbot::save_url( url_result, options )
         end
-
-        url_results << url_result
-
-        Adbot::output_json( url_result, options )
-        #Adbot::save_url( url_result, options )
+        
+        puts "scan failed for url #{url_message.to_s}" if (not url_result or url_result.error_scanning) and options.verbose
 
         AWS::SQS::done_with_next_url url_message
       end # loop do

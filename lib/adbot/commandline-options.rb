@@ -7,7 +7,8 @@ module Adbot
 
     def parse_options( argv )
       collected_options = OpenStruct.new
-      
+
+      collected_options.follow_ads = true
       collected_options.output_dir = "/tmp/"
       collected_options.selenium_host = "localhost"
       collected_options.selenium_port = 4444
@@ -19,6 +20,10 @@ module Adbot
 
         opts.on("-o", "--output-directory DIR", String, "optional. output scan data to DIR (default /tmp)") do |dir|
           collected_options.output_dir = dir
+        end
+
+        opts.on("-n", "--no-follow-ads", "optional. don't follow advertisements by clicking on them") do
+          collected_options.follow_ads = false
         end
         
         opts.on("--selenium-host HOST", String, "optional. ip address or domain of selenium server (default localhost)") do |host|

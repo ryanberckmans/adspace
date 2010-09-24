@@ -2,9 +2,35 @@ require 'ostruct'
 require 'digest/md5'
 require 'uri'
 
+$quantcast_ranks = {}
+
 module Util
   def self.md5( o )
     Digest::MD5.hexdigest(o)
+  end
+
+  def self.here( string )
+    File.expand_path(File.join(File.dirname(caller[0].split(":")[0]), string))
+  end
+
+  QUANTCAST_TOP_MILLION = File.read( here("../../data/quantcast-top-million.txt") )
+  QUANTCAST_TOP_MILLION.gsub(/^(\d+)\t(.*)$/) { |m|
+    $quantcast_ranks[ $2 ] = $1
+    m
+  }
+  
+  def self.quantcast_rank( url_result )
+    url_result.quantcast_rank = -1
+    result_domain = url_result.domain.sub(/http:\/\//, "")
+    $quantcast_ranks.each_pair { |domain,rank|
+      if result_domain == domain
+        puts result_domain
+        puts domain
+        puts rank
+        url_result.quantcast_rank = rank
+        return
+      end
+    }
   end
 
   def self.decompose_url(url)
@@ -42,7 +68,4 @@ module Util
     end
   end
 
-  def self.here( string )
-    File.expand_path(File.join(File.dirname(caller[0].split(":")[0]), string))
-  end
 end

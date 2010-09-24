@@ -141,7 +141,49 @@ module Adbot
       end
     end
 
-    def output_json( url_result, options )
+    def output_tabular( url_result, options )
+      begin
+        to_write = ""
+        tab = "\t"
+        prefix =
+          url_result.date + tab +
+          url_result.url + tab +
+          url_result.quantcast_rank + tab +
+          url_result.domain + tab +
+          url_result.path + tab +
+          url_result.title + tab +
+          url_result.page_width.to_s + tab +
+          url_result.page_height.to_s + tab
+        
+        if url_result.ads.length > 0
+          url_result.ads.each { |ad|
+            to_write += prefix +
+              ad.element_type + tab +
+              ad.link_url + tab +
+              ad.target_location + tab +
+              ad.screenshot_top.to_s + tab +
+              ad.screenshot_left.to_s + tab +
+              ad.screenshot_width.to_s + tab +
+              ad.screenshot_height.to_s + "\n"
+          }
+        else
+          to_write += prefix + "-1\n"
+        end
+
+        file_path = options.output_dir # output dir is treated as a file path when using output_tabular
+        f = File.open file_path, "a"
+        f.write to_write
+        puts "wrote results for #{url_result.url} to #{file_path}" if options.verbose
+      rescue Exception => e
+        puts e.backtrace
+        puts e.message
+        puts "failed to write to #{options.output_dir} for #{url_result.url}"
+      ensure
+        f.close rescue nil
+      end
+    end
+
+    def output_json( url_result, options ) 
       begin
         file_path = options.output_dir + url_result.url.split("//")[1].gsub("/", ".") + ".txt"
         f = File.open file_path, "a"
@@ -158,5 +200,6 @@ module Adbot
         f.close
       end
     end
-  end
+    
+  end # class << self
 end 

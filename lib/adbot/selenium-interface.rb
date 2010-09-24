@@ -68,7 +68,7 @@ module SeleniumInterface
     end
 
     def open_page( browser, relative_path  = "/" )
-      handle_timeout { browser.open relative_path }
+      browser.open relative_path
     end
 
     def on( browser, expr )
@@ -79,14 +79,22 @@ module SeleniumInterface
       on browser, "highlight_ads()"
     end
 
+    def select_window( browser, window_name )
+      # safer than browser.open_window
+      # http://jira.openqa.org/browse/SEL-339
+      browser.open_window "", window_name
+      browser.select_window window_name
+    end
+
     def get_link_target_location( browser, link_url )
-      browser.open_window link_url, "link-url-window"
-      browser.select_window "link-url-window"
+      sleep 1 # don't hit selenium so hard
+      window_name = "link-url-window"
+      browser.open_window link_url, window_name
+      select_window browser, window_name
       handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
-      location = browser.location
-      browser.close # close link-url-window
-      browser.select_window nil # reselect main window
-      location
+      l = browser.location
+      puts "link url (#{link_url}) had location #{l}"
+      l
     end
 
     def include_browser_util( browser )
@@ -96,11 +104,11 @@ module SeleniumInterface
     end
 
     def page_width( browser )
-      on browser, "page_width"
+      (on browser, "page_width").to_f
     end
 
     def page_height( browser )
-      on browser, "page_height"
+      (on browser, "page_height").to_f
     end
 
     def page_title( browser )
@@ -122,11 +130,11 @@ module SeleniumInterface
         ads << ad
 
         ad.link_url = Util::unescape_html((on browser, "current_ad.link_url"))
-        ad.link_url = nil if ad.link_url =~ /\s/ # naively don't allow URIs with whitespace. don't use URI.parse because some adnetworks use invalid URIs
-        ad.link_url = nil if ad.link_url.length < 10 # naively don't allow short link_urls
-        ad.link_url = nil if ad.link_url =~ /link-url-not-supported/ # this is what browser-util defaults to
+        ad.link_url = "" if ad.link_url =~ /\s/ # naively don't allow URIs with whitespace. don't use URI.parse because some adnetworks use invalid URIs
+        ad.link_url = "" if ad.link_url.length < 10 # naively don't allow short link_urls
+        ad.link_url = "" if ad.link_url =~ /link-url-not-supported/ # this is what browser-util defaults to
         
-        ad.type = on browser, "current_ad.type"
+        ad.element_type = on browser, "current_ad.type"
         ad.screenshot_left = (on browser, "current_ad.screenshot_left").to_f
         ad.screenshot_top = (on browser, "current_ad.screenshot_top").to_f
         ad.screenshot_width = (on browser, "current_ad.screenshot_width").to_f
