@@ -23,6 +23,11 @@ module UrlInjector
 
       require "core/sqs-interface.rb"
 
+      if options.size
+        puts "url queue size: #{AWS::SQS::size}"
+        exit
+      end
+      
       abort "no urls to inject" unless options.urls.length > 0
 
       options.urls.each do

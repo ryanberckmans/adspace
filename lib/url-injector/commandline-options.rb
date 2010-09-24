@@ -6,6 +6,7 @@ module UrlInjector
     def parse_options( argv )
       collected_options = OpenStruct.new
 
+      collected_options.size = false
       collected_options.repeat = 1
       collected_options.urls = []
 
@@ -20,6 +21,10 @@ module UrlInjector
 
         opts.on("--url URL", String, "Optional. Inject URL. Use --url any number of times. Each URL must be prefixed with transport protocol (i.e. http://)") do |url|
           collected_options.urls.push url
+        end
+
+        opts.on("-s", "--size", "optional. return the current size of the url queue and then exit") do
+          collected_options.size = true
         end
 
         opts.on("-r", "--repeat-num-times INT", Integer, "Optional. Integer specifying how many times to inject each url (default 1)") do |repeat|

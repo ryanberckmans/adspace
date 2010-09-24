@@ -108,6 +108,10 @@ module AWS
           puts e.message
         end
       end
+
+      def size
+        @@url_queue.size
+      end
       
     end # class << self
   end # module SQS
