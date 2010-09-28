@@ -52,7 +52,7 @@ module Adbot
         html = SeleniumInterface::get_page_source browser
         raise unless html
 
-        html = Util::unescape_html html
+        html = Util::unescape_html html rescue html
         url_result.html = html
 
         SeleniumInterface::include_browser_util browser
@@ -91,6 +91,7 @@ module Adbot
         puts e.backtrace
         puts e.message
         url_result.error_scanning = true
+        url_result.exception = e
       ensure
         SeleniumInterface::end_session browser
       end 
