@@ -12,13 +12,15 @@ class OpenStruct
   end
 end
 
+# ActiveSupport requires rubygems >= 1.3.6, zr1 has 1.3.4
+
 # workaround for activesupport vs. json_pure vs. Ruby 1.8 glitch
 # source: http://pivotallabs.com/users/alex/blog/articles/1332-monkey-patch-of-the-day-activesupport-vs-json-pure-vs-ruby-1-8
-if JSON.const_defined?(:Pure)
-  class JSON::Pure::Generator::State
-    include ActiveSupport::CoreExtensions::Hash::Except
-  end
-end
+#if JSON.const_defined?(:Pure)
+#  class JSON::Pure::Generator::State
+#    include ActiveSupport::CoreExtensions::Hash::Except
+#  end
+#end  
 
 module Adbot
   class << self
