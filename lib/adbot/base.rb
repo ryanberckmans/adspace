@@ -65,8 +65,10 @@ module Adbot
 
         if url_result and not url_result.error_scanning
           url_results << url_result
-          Adbot::output_tabular( url_result, options )
+          Adbot::output_tabular url_result, options
           #Adbot::save_url( url_result, options )
+        elsif url_result and url_result.error_scanning
+          Adbot::output_error url_result, options
         end
         
         puts "scan failed for url #{url_message.to_s}" if (not url_result or url_result.error_scanning) and options.verbose

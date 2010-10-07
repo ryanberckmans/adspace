@@ -1,3 +1,4 @@
+require "timeout"
 require "date"
 require 'base64'
 require "core/util.rb"
@@ -52,7 +53,7 @@ module Adbot
         html = SeleniumInterface::get_page_source browser
         raise unless html
 
-        html = Util::unescape_html html
+        html = Util::unescape_html html rescue html
         url_result.html = html
 
         SeleniumInterface::include_browser_util browser
@@ -81,16 +82,19 @@ module Adbot
             puts ad.target_location
           }
         end
-        
+
       rescue Errno::ECONNREFUSED => e
         puts "connection to selenium server failed"
         raise
-      rescue Interrupt, SystemExit
-        raise
-      rescue Exception => e
+      rescue Timeout::Error, StandardError => e
+        # Timeout::Error, raised if an http connection times out, derives from Interrupt, which is also the exception for SIGnals.
+        # catch Timeout::Error, but re-raise Interrupt so that SIGnals work correctly.
         puts e.backtrace
         puts e.message
         url_result.error_scanning = true
+        url_result.exception = e
+      rescue Interrupt, SystemExit
+        raise
       ensure
         SeleniumInterface::end_session browser
       end 
