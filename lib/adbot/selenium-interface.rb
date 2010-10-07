@@ -87,7 +87,7 @@ module SeleniumInterface
     end
 
     def get_link_target_location( browser, link_url )
-      sleep 1 # don't hit selenium so hard
+      sleep 0.5 # don't hit selenium so hard
       window_name = "link-url-window"
       browser.open_window link_url, window_name
       select_window browser, window_name
@@ -129,7 +129,8 @@ module SeleniumInterface
         ad = OpenStruct.new
         ads << ad
 
-        ad.link_url = Util::unescape_html((on browser, "current_ad.link_url"))
+        raw_link_url = on browser, "current_ad.link_url"
+        ad.link_url = Util::unescape_html raw_link_url rescue raw_link_url
         ad.link_url = "" if ad.link_url =~ /\s/ # naively don't allow URIs with whitespace. don't use URI.parse because some adnetworks use invalid URIs
         ad.link_url = "" if ad.link_url.length < 10 # naively don't allow short link_urls
         ad.link_url = "" if ad.link_url =~ /link-url-not-supported/ # this is what browser-util defaults to
