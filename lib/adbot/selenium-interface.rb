@@ -14,7 +14,7 @@ module SeleniumInterface
 
   class << self
 
-    MINI_PAGE_TIMEOUT = 15 # seconds
+    MINI_PAGE_TIMEOUT = 30 # seconds
     PAGE_TIMEOUT = 120 # seconds
     DEFAULT_TIMEOUT = 300 # seconds, also used as http read timeout for selenium server connection
 
@@ -53,10 +53,12 @@ module SeleniumInterface
     def handle_timeout
       begin
         yield
+        $timed_out = false
       rescue Selenium::CommandError => e
         if e.message =~ /Timed out after/
           puts e.message
           puts "selenium timed out, attempting to continue operation"
+          $timed_out = true
         else
           raise
         end
@@ -72,11 +74,11 @@ module SeleniumInterface
     end
 
     def on( browser, expr )
-      browser.get_eval "this.browserbot.getUserWindow().adbot.#{expr};"
+      browser.get_eval "this.browserbot.getUserWindow().#{expr};"
     end
 
     def highlight_ads( browser )
-      on browser, "highlight_ads()"
+      on browser, "adbot.highlight_ads()"
     end
 
     def select_window( browser, window_name )
@@ -87,13 +89,14 @@ module SeleniumInterface
     end
 
     def get_link_target_location( browser, link_url )
-      sleep 1 # don't hit selenium so hard
+      sleep 2 # don't hit selenium so hard
       window_name = "link-url-window"
       browser.open_window link_url, window_name
       select_window browser, window_name
       handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
+      handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT } if $timed_out # re-try once
       l = browser.location
-      puts "link url (#{link_url}) had location #{l}"
+      puts "link url (#{link_url}) had location::: #{l}"
       l
     end
 
@@ -104,44 +107,70 @@ module SeleniumInterface
     end
 
     def page_width( browser )
-      (on browser, "page_width").to_f
+      (on browser, "adbot.page_width").to_f
     end
 
     def page_height( browser )
-      (on browser, "page_height").to_f
+      (on browser, "adbot.page_height").to_f
     end
 
     def page_title( browser )
       browser.title
     end
 
-    def scan_date( browser )
-      on browser, "date"
+    def get_ad_frames( browser )
+      on browser, "adbot.collect_frames()"
+      frame_names = on browser, "adbot.frame_names"
+      puts "frame names: #{frame_names}"
+      frame_names.split ","
     end
 
-    def get_ads( browser )
+    def get_ads_in_current_frame( browser )
+      on browser, "ADBOTjQuery( this.browserbot.getUserWindow().adbot.process_ads );"
+      
       ads = []
-      on browser, "ad_iterator()"
+      on browser, "adbot.ad_iterator()"
       while( true )
-        on browser, "next_ad()"
-        break unless (on browser, "is_next_ad") == "true"
+        on browser, "adbot.next_ad()"
+        break unless (on browser, "adbot.is_next_ad") == "true"
 
         ad = OpenStruct.new
         ads << ad
 
-        ad.link_url = Util::unescape_html((on browser, "current_ad.link_url"))
+        ad.link_url = on browser, "adbot.current_ad.link_url"
+        if ad.link_url =~ /SCRAPEME/
+          puts "SCRAPME: trying to scrape from #{ad.link_url}"
+          ad.link_url = (ad.link_url.scan /clicktag.*?(http.*?)(;|'|")/i)[0][0] rescue ""
+          puts "scraped: #{ad.link_url}"
+        end
+        ad.link_url = Util::unesacpe_html ad.link_url rescue ad.link_url
+        ad.link_url.gsub!(/%([0-9a-f][0-9a-f])/i) { $1.hex.chr }
         ad.link_url = "" if ad.link_url =~ /\s/ # naively don't allow URIs with whitespace. don't use URI.parse because some adnetworks use invalid URIs
         ad.link_url = "" if ad.link_url.length < 10 # naively don't allow short link_urls
         ad.link_url = "" if ad.link_url =~ /link-url-not-supported/ # this is what browser-util defaults to
-        
-        ad.element_type = on browser, "current_ad.type"
-        ad.screenshot_left = (on browser, "current_ad.screenshot_left").to_f
-        ad.screenshot_top = (on browser, "current_ad.screenshot_top").to_f
-        ad.screenshot_width = (on browser, "current_ad.screenshot_width").to_f
-        ad.screenshot_height = (on browser, "current_ad.screenshot_height").to_f
+
+        ad.element_type = on browser, "adbot.current_ad.type"
+        #ad.screenshot_left = (on browser, "adbot.current_ad.screenshot_left").to_f
+        #ad.screenshot_top = (on browser, "adbot.current_ad.screenshot_top").to_f
+        #ad.screenshot_width = (on browser, "adbot.current_ad.screenshot_width").to_f
+        #ad.screenshot_height = (on browser, "adbot.current_ad.screenshot_height").to_f
         
         puts "found a next ad in browser:"
         puts ad
+      end
+      ads
+    end
+
+    def get_ads( browser )
+      ads = get_ads_in_current_frame browser
+      (get_ad_frames browser).each do |frame|
+        puts "entering frame #{frame}"
+        browser.select_frame frame
+        include_browser_util browser
+        on browser, "ADBOTjQuery('a,iframe,object,embed').addClass(this.browserbot.getUserWindow().adbot.ad_class)"
+        ads.concat(get_ads browser)
+        browser.select_frame "relative=up"
+        puts "exited frame #{frame}"
       end
       ads
     end
