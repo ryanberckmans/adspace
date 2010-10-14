@@ -14,8 +14,8 @@ module SeleniumInterface
 
   class << self
 
-    MINI_PAGE_TIMEOUT = 30 # seconds
-    PAGE_TIMEOUT = 120 # seconds
+    MINI_PAGE_TIMEOUT = 40 # seconds
+    PAGE_TIMEOUT = 160 # seconds
     DEFAULT_TIMEOUT = 300 # seconds, also used as http read timeout for selenium server connection
 
     MILLIS_IN_SECOND = 1000
@@ -89,12 +89,11 @@ module SeleniumInterface
     end
 
     def get_link_target_location( browser, link_url )
-      sleep 2 # don't hit selenium so hard
-      window_name = "link-url-window"
+      sleep 1 # don't hit selenium so hard
+      window_name = "link-url-window#{Util::md5 link_url}"
       browser.open_window link_url, window_name
       select_window browser, window_name
       handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
-      handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT } if $timed_out # re-try once
       l = browser.location
       puts "link url (#{link_url}) had location::: #{l}"
       l

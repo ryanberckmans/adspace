@@ -8,14 +8,16 @@ module Adbot
   class << self
     
     private
-    def follow_ad_link_urls( ads, browser, options )
+    def follow_ad_link_urls( ads, browser, domain, options )
       ads.each do |ad|
         (ad.target_location = "not-following-ads" and next) unless options.follow_ads
         begin
-          raise "ad didn't have link_url to follow" unless ad.link_url and ad.link_url.length > 0
+          (ad.target_location = "no-link-url" and next) unless ad.link_url and ad.link_url.length > 0
+          (ad.target_location = "link-url-points-to-same-domain" and next) if Util::domain_contains_url domain, ad.link_url # todo algorithm for subdomains
+          (ad.target_location = "link-url-is-javascript" and next) if ad.link_url =~ /^javascript/i
           ad.target_location = SeleniumInterface::get_link_target_location( browser, ad.link_url ) 
         rescue Exception => e
-          ad.target_location = "no-target-location"
+          ad.target_location = "error-getting-target-location"
           puts e.backtrace
           puts e.message
           puts "error getting ad target location, continuing scan"
@@ -58,16 +60,16 @@ module Adbot
 
         SeleniumInterface::include_browser_util browser
 
-        url_result.screenshot = SeleniumInterface::page_screenshot browser
-        File.open("/tmp/#{url_result.url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue puts "failed to save screenshot"
-
         url_result.ads = SeleniumInterface::get_ads browser
         url_result.page_width = SeleniumInterface::page_width browser
         url_result.page_height = SeleniumInterface::page_height browser
         url_result.title = SeleniumInterface::page_title browser
         url_result.date = Time.now.to_f.to_s
+
+        url_result.screenshot = SeleniumInterface::page_screenshot browser
+        File.open("/tmp/#{url_result.url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue puts "failed to save screenshot"
         
-        follow_ad_link_urls( url_result.ads, browser, options )
+        follow_ad_link_urls( url_result.ads, browser, url_result.domain, options )
 
         Util::quantcast_rank url_result
 

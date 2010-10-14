@@ -37,6 +37,15 @@ module Util
     }
   end
 
+  def self.domain_contains_url(domain, url)
+    domain = URI.parse(domain) rescue OpenStruct.new
+    uri = URI.parse(url) rescue OpenStruct.new
+    return false unless uri.scheme and uri.host
+    return false unless domain.scheme and domain.host
+    domain = domain.host
+    (uri.host[uri.host.length - domain.length, domain.length] == domain) rescue false
+  end
+
   def self.decompose_url(url)
     uri = URI.parse(url) rescue OpenStruct.new
     return unless uri.scheme and uri.host
