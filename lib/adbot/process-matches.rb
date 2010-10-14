@@ -186,6 +186,7 @@ module Adbot
         if url_result.ads.length > 0
           url_result.ads.each { |ad|
             to_write += prefix +
+            ad.format + tab +
             ad.element_type + tab +
             ad.link_url + tab +
             ad.target_location + tab +

@@ -95,6 +95,11 @@ module SeleniumInterface
       select_window browser, window_name
       handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
       l = browser.location
+      if l == "about:blank"
+        puts "location was about:blank, waiting longer..."
+        handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
+        l = browser.location
+      end
       puts "link url (#{link_url}) had location::: #{l}"
       l
     end
@@ -118,7 +123,6 @@ module SeleniumInterface
     end
 
     def get_ad_frames( browser )
-      on browser, "adbot.collect_frames()"
       frame_names = on browser, "adbot.frame_names"
       puts "frame names: #{frame_names}"
       frame_names.split ","
@@ -142,13 +146,13 @@ module SeleniumInterface
           ad.link_url = (ad.link_url.scan /clicktag.*?(http.*?)(;|'|")/i)[0][0] rescue ""
           puts "scraped: #{ad.link_url}"
         end
-        ad.link_url = Util::unesacpe_html ad.link_url rescue ad.link_url
+        ad.link_url = Util::unescape_html ad.link_url rescue ad.link_url
         ad.link_url.gsub!(/%([0-9a-f][0-9a-f])/i) { $1.hex.chr }
         ad.link_url = "" if ad.link_url =~ /\s/ # naively don't allow URIs with whitespace. don't use URI.parse because some adnetworks use invalid URIs
         ad.link_url = "" if ad.link_url.length < 10 # naively don't allow short link_urls
-        ad.link_url = "" if ad.link_url =~ /link-url-not-supported/ # this is what browser-util defaults to
 
-        ad.element_type = on browser, "adbot.current_ad.type"
+        ad.element_type = on browser, "adbot.current_ad.element_type"
+        ad.format = on browser, "adbot.current_ad.format"
         #ad.screenshot_left = (on browser, "adbot.current_ad.screenshot_left").to_f
         #ad.screenshot_top = (on browser, "adbot.current_ad.screenshot_top").to_f
         ad.screenshot_width = (on browser, "adbot.current_ad.screenshot_width").to_f

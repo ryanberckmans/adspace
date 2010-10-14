@@ -13,8 +13,10 @@ module Adbot
         (ad.target_location = "not-following-ads" and next) unless options.follow_ads
         begin
           (ad.target_location = "no-link-url" and next) unless ad.link_url and ad.link_url.length > 0
-          (ad.target_location = "link-url-points-to-same-domain" and next) if Util::domain_contains_url domain, ad.link_url # todo algorithm for subdomains
+          (ad.target_location = "link-url-points-to-same-domain" and next) if Util::domain_contains_url domain, ad.link_url
+          (ad.target_location = "link-url-was-google-adsense" and next) if Util::domain_contains_url "http://google.com", ad.link_url
           (ad.target_location = "link-url-is-javascript" and next) if ad.link_url =~ /^javascript/i
+          (ad.target_location = "failed-link-url" and next) if ad.link_url =~ /^failed/i
           ad.target_location = SeleniumInterface::get_link_target_location( browser, ad.link_url ) 
         rescue Exception => e
           ad.target_location = "error-getting-target-location"
