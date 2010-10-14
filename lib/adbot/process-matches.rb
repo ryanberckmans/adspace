@@ -188,11 +188,11 @@ module Adbot
             to_write += prefix +
             ad.element_type + tab +
             ad.link_url + tab +
-            ad.target_location + "\n" #tab +
+            ad.target_location + tab +
             #ad.screenshot_top.to_s + tab +
             #ad.screenshot_left.to_s + tab +
-            #ad.screenshot_width.to_s + tab +
-            #ad.screenshot_height.to_s + "\n"
+            ad.screenshot_width.to_s + tab +
+            ad.screenshot_height.to_s + "\n"
           }
         else
           to_write += prefix + "-1\n"

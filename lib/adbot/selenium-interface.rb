@@ -126,7 +126,7 @@ module SeleniumInterface
     end
 
     def get_ads_in_current_frame( browser )
-      on browser, "ADBOTjQuery( this.browserbot.getUserWindow().adbot.process_ads );"
+      on browser, "ADBOTjQuery( this.browserbot.getUserWindow().adbot.process_ads )"
       
       ads = []
       on browser, "adbot.ad_iterator()"
@@ -152,12 +152,15 @@ module SeleniumInterface
         ad.element_type = on browser, "adbot.current_ad.type"
         #ad.screenshot_left = (on browser, "adbot.current_ad.screenshot_left").to_f
         #ad.screenshot_top = (on browser, "adbot.current_ad.screenshot_top").to_f
-        #ad.screenshot_width = (on browser, "adbot.current_ad.screenshot_width").to_f
-        #ad.screenshot_height = (on browser, "adbot.current_ad.screenshot_height").to_f
+        ad.screenshot_width = (on browser, "adbot.current_ad.screenshot_width").to_f
+        ad.screenshot_height = (on browser, "adbot.current_ad.screenshot_height").to_f
         
         puts "found a next ad in browser:"
         puts ad
       end
+
+      on browser, "adbot.highlight_ads()"
+      
       ads
     end
 
