@@ -100,6 +100,11 @@ module SeleniumInterface
         handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
         l = browser.location
       end
+      if l == link_url
+        puts "location was same as link_url, waiting longer..."
+        handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
+        l = browser.location
+      end
       puts "link url (#{link_url}) had location::: #{l}"
       l
     end
