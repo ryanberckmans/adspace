@@ -77,7 +77,7 @@ module Adbot
         url_result.date = Time.now.to_f.to_s
 
         url_result.screenshot = SeleniumInterface::page_screenshot browser
-        File.open("/tmp/#{url_result.url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue puts "failed to save screenshot"
+        # File.open("/tmp/#{url_result.url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue puts "failed to save screenshot"
         
         follow_ad_link_urls( url_result.ads, browser, url_result.domain, options )
 
