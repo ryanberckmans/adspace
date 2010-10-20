@@ -89,11 +89,13 @@ module SeleniumInterface
     end
 
     def get_link_target_location( browser, link_url )
-      sleep 1 # don't hit selenium so hard
-      window_name = "link-url-window#{Util::md5 link_url}"
-      browser.open_window link_url, window_name
-      select_window browser, window_name
-      handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
+      def open_link_url( browser, link_url )
+        window_name = "link-url-window#{Util::md5 link_url}"
+        browser.open_window link_url, window_name
+        select_window browser, window_name
+        handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
+      end
+      open_link_url browser, link_url
       l = browser.location
       if l == "about:blank"
         puts "location was about:blank, waiting longer..."
@@ -101,8 +103,8 @@ module SeleniumInterface
         l = browser.location
       end
       if l == link_url
-        puts "location was same as link_url, waiting longer..."
-        handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
+        puts "location was same as link_url, retrying..."
+        open_link_url browser, link_url
         l = browser.location
       end
       puts "link url (#{link_url}) had location::: #{l}"
