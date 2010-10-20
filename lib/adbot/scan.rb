@@ -9,6 +9,7 @@ module Adbot
     
     private
     def follow_ad_link_urls( ads, browser, domain, options )
+      resolved_link_urls = {}
       ads.each do |ad|
         (ad.target_location = "not-following-ads" and next) unless options.follow_ads
         begin
@@ -18,12 +19,18 @@ module Adbot
           (ad.target_location = "link-url-was-google-page-of-ads" and next) if ad.link_url =~ /doubleclick\.net\/pagead\/ads/i
           (ad.target_location = "link-url-is-javascript" and next) if ad.link_url =~ /^javascript/i
           (ad.target_location = "failed-link-url" and next) if ad.link_url =~ /^failed/i
-          ad.target_location = SeleniumInterface::get_link_target_location( browser, ad.link_url ) 
+          if resolved_link_urls[ad.link_url]
+            ad.target_location = resolved_link_urls[ad.link_url]
+            puts "link url (#{ad.link_url}) resolved by cache to location::: #{ad.target_location}"
+            next
+          end
+          ad.target_location = SeleniumInterface::get_link_target_location( browser, ad.link_url )
+          resolved_link_urls[ad.link_url] = ad.target_location
         rescue Exception => e
           ad.target_location = "error-getting-target-location"
           puts e.backtrace
           puts e.message
-          puts "error getting ad target location, continuing scan"
+          puts "error getting ad target location (#{e.class}, #{e.class.ancestors.join ","}), continuing scan"
         end
       end
     end
@@ -97,10 +104,10 @@ module Adbot
         url_result.error_scanning = true
         url_result.exception = e
       rescue Interrupt, SystemExit => e
-        puts "scan.rb: re-raising caught exception: #{e.class} (#{e.class.ancestors.to_s})"
+        puts "scan.rb: re-raising caught exception: #{e.class} (#{e.class.ancestors.join ","})"
         raise
       rescue Exception => e
-        puts "scan.rb: re-raising unknown exception: #{e.class} (#{e.class.ancestors.to_s})"
+        puts "scan.rb: re-raising unknown exception: #{e.class} (#{e.class.ancestors.join ","})"
         raise
       ensure
         SeleniumInterface::end_session browser
