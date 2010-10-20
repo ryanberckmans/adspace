@@ -45,6 +45,7 @@ module UrlInjector
         options.repeat.times do 
           AWS::SQS::push_url url
           puts "injected " + url if options.verbose
+          sleep 0.15 # don't hit sqs so hard. they can handle it but we crash sometimes
         end
       end
 
