@@ -31,7 +31,9 @@ module Adbot
         puts "--bail invoked, terminating"
         exit
       end
-      
+
+      $SQS_QUEUE = options.sqs_queue if options.sqs_queue
+      puts "using sqs queue #{$SQS_QUEUE}" if $SQS_QUEUE
       require "core/sqs-interface.rb"
       
       url_results = []
@@ -39,11 +41,6 @@ module Adbot
       consecutive_sleeps = 0
 
       loop do
-        if cmd = AWS::SQS::command?
-          Adbot::output_json( url_results, options ) if cmd == AWS::SQS::PROCESS_MATCHES
-          abort "received shutdown command" if cmd == AWS::SQS::SHUTDOWN
-        end
-        
         begin
           url_message = AWS::SQS::next_url
         rescue Interrupt, SystemExit

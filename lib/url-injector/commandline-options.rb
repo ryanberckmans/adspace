@@ -6,7 +6,9 @@ module UrlInjector
     def parse_options( argv )
       collected_options = OpenStruct.new
 
+      collected_options.sqs_queue = nil
       collected_options.size = false
+      collected_options.clear = false
       collected_options.repeat = 1
       collected_options.urls = []
 
@@ -25,6 +27,14 @@ module UrlInjector
 
         opts.on("-s", "--size", "optional. return the current size of the url queue and then exit") do
           collected_options.size = true
+        end
+
+        opts.on("--sqs QUEUE", String, "optional. use QUEUE instead of the default sqs queue") do |queue|
+          collected_options.sqs_queue = queue
+        end
+
+        opts.on("-c", "--clear-queue", "optional. clear the queue and then exit") do
+          collected_options.clear = true
         end
 
         opts.on("-r", "--repeat-num-times INT", Integer, "Optional. Integer specifying how many times to inject each url (default 1)") do |repeat|

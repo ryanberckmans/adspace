@@ -12,6 +12,7 @@ module Adbot
       collected_options.output_dir = "/tmp/"
       collected_options.selenium_host = "localhost"
       collected_options.selenium_port = 4444
+      collected_options.sqs_queue = nil
       
       opts = OptionParser.new do |opts|
         opts.banner = "usage: scanner [options]"
@@ -24,6 +25,10 @@ module Adbot
 
         opts.on("-n", "--no-follow-ads", "optional. don't follow advertisements by clicking on them") do
           collected_options.follow_ads = false
+        end
+
+        opts.on("--sqs QUEUE", String, "optional. use QUEUE instead of the default sqs queue") do |queue|
+          collected_options.sqs_queue = queue
         end
         
         opts.on("--selenium-host HOST", String, "optional. ip address or domain of selenium server (default localhost)") do |host|

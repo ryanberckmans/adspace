@@ -12,13 +12,9 @@ module AWS
     #  in rare cases, a recieved message   i) may have already been deleted  ii) may be within its visibility timeout
     #   it is our responsibility to handle redundant/duplicate messages
 
-    URL_QUEUE = "url-queue"
-    COMMAND_QUEUE = "command-queue"
+    URL_QUEUE = $SQS_QUEUE ? $SQS_QUEUE : "url-queue"
     URL_QUEUE_VISIBILITY = 180 # seconds
 
-    PROCESS_MATCHES = "process-matches"
-    SHUTDOWN = "shutdown"
-    
     class << self
 
       begin
@@ -37,52 +33,10 @@ module AWS
         raise
       end
 
-      # command_queue should be a publish/subscribe slots/signals implementation using AWS::SimpleNotificationService, but no ruby SNS client atm
-      begin
-        @@command_queue = @@sqs.queue(COMMAND_QUEUE)
-      rescue Exception => e
-        puts e.message
-        puts "error creating/retrieving #{COMMAND_QUEUE} queue"
-        raise
-      end
-
       def clear
         @@url_queue.delete
-        @@command_queue.delete
-        # helper method for testing, does not recreate the queues, so the module cannot be used after calling this method
       end
 
-      def process_matches
-        begin
-          @@command_queue.push PROCESS_MATCHES
-        rescue Exception =>e
-          puts e.backtrace
-          puts e.message
-          raise
-        end
-      end
-
-      def shutdown
-        begin
-          @@command_queue.push SHUTDOWN
-        rescue Exception =>e
-          puts e.backtrace
-          puts e.message
-          raise
-        end
-      end
-
-      def command?
-        begin
-          m = @@command_queue.pop
-          m = m.to_s if m
-          m
-        rescue Exception =>e 
-          puts e.message
-          nil
-        end
-      end        
-      
       def push_url( url )
         begin
           @@url_queue.push url
