@@ -5,20 +5,20 @@ $:.unshift File.expand_path(File.dirname(__FILE__) + "/../lib")
 require "adbot/base.rb"
 
 # persistence
-require 'active_record'
-require 'right_aws'
-require 'yaml'
+#require 'active_record'
+#require 'right_aws'
+#require 'yaml'
 
-require 'adabase/app/models/scan.rb'
-require 'adabase/app/models/ad.rb'
-require 'adabase/app/models/screenshot.rb'
-require 'adabase/app/models/ad_image.rb'
+#require 'adabase/app/models/scan.rb'
+#require 'adabase/app/models/ad.rb'
+#require 'adabase/app/models/screenshot.rb'
+#require 'adabase/app/models/ad_image.rb'
 
-s3 = RightAws::S3.new(File.read('../aws/access-key').strip,
-                      File.read('../aws/secret-access-key').strip)
+#s3 = RightAws::S3.new(File.read('../aws/access-key').strip,
+#                      File.read('../aws/secret-access-key').strip)
 
-Screenshot.bucket = RightAws::S3::Bucket.new(s3, 'adchart_screenshots')
+#Screenshot.bucket = RightAws::S3::Bucket.new(s3, 'adchart_screenshots')
 
-ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')
+#ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')
 
 Adbot::run
