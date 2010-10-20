@@ -12,7 +12,7 @@ module AWS
     #  in rare cases, a recieved message   i) may have already been deleted  ii) may be within its visibility timeout
     #   it is our responsibility to handle redundant/duplicate messages
 
-    URL_QUEUE = $SQS_QUEUE ? $SQS_QUEUE : "url-queue"
+    URL_QUEUE = $SQS_QUEUE || "url-queue"
     URL_QUEUE_VISIBILITY = 180 # seconds
 
     class << self
