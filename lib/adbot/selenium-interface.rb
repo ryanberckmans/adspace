@@ -89,22 +89,14 @@ module SeleniumInterface
     end
 
     def get_link_target_location( browser, link_url )
-      def open_link_url( browser, link_url )
-        window_name = "link-url-window#{Util::md5 link_url}"
-        browser.open_window link_url, window_name
-        select_window browser, window_name
-        handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
-      end
-      open_link_url browser, link_url
+      window_name = "link-url-window#{Util::md5 link_url}"
+      browser.open_window link_url, window_name
+      select_window browser, window_name
+      handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
       l = browser.location
       if l == "about:blank"
         puts "location was about:blank, waiting longer..."
         handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
-        l = browser.location
-      end
-      if l == link_url
-        puts "location was same as link_url, retrying..."
-        open_link_url browser, link_url
         l = browser.location
       end
       puts "link url (#{link_url}) had location::: #{l}"
@@ -151,10 +143,11 @@ module SeleniumInterface
         if ad.link_url =~ /SCRAPEME/
           puts "SCRAPME: trying to scrape from #{ad.link_url}"
           ad.link_url = (ad.link_url.scan /clicktag.*?(http.*?)(;|'|")/i)[0][0] rescue ""
-          puts "scraped: #{ad.link_url}"
+          ad.link_url.sub! /^http%3A/i, "http:"
+          ad.link_url.sub! /^http:%2F/i, "http:/"
+          ad.link_url.sub! /^http:\/%2F/i, "http://"
+          puts "SCRAPED: #{ad.link_url}"
         end
-        ad.link_url = Util::unescape_html ad.link_url rescue ad.link_url
-        ad.link_url.gsub!(/%([0-9a-f][0-9a-f])/i) { $1.hex.chr }
         ad.link_url = "" if ad.link_url =~ /\s/ # naively don't allow URIs with whitespace. don't use URI.parse because some adnetworks use invalid URIs
         ad.link_url = "" if ad.link_url.length < 10 # naively don't allow short link_urls
 
