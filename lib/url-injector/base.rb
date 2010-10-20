@@ -21,10 +21,20 @@ module UrlInjector
         exit
       end
 
+      $SQS_QUEUE = options.sqs_queue if options.sqs_queue
+      puts "using sqs queue #{$SQS_QUEUE}" if $SQS_QUEUE
       require "core/sqs-interface.rb"
 
       if options.size
         puts "url queue size: #{AWS::SQS::size}"
+        exit
+      end
+
+      if options.clear
+        AWS::SQS::clear rescue nil
+        msg = "cleared the queue"
+        msg += " #{$SQS_QUEUE}" if $SQS_QUEUE
+        puts msg
         exit
       end
       

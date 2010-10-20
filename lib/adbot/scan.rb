@@ -96,7 +96,11 @@ module Adbot
         puts e.message
         url_result.error_scanning = true
         url_result.exception = e
-      rescue Interrupt, SystemExit
+      rescue Interrupt, SystemExit => e
+        puts "scan.rb: re-raising caught exception: #{e.class} (#{e.class.ancestors.to_s})"
+        raise
+      rescue Exception => e
+        puts "scan.rb: re-raising unknown exception: #{e.class} (#{e.class.ancestors.to_s})"
         raise
       ensure
         SeleniumInterface::end_session browser
