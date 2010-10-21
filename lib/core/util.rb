@@ -14,7 +14,12 @@ module Util
 
   def self.init_quantcast
     $quantcast_ranks = {}
-    quantcast_top_million = File.read( here("../../data/quantcast-top-million.txt") )
+    quantcast_top_million = ""
+    File.open( here("../../data/quantcast-top-million.txt") ) do |file|
+      max_sites = 20000
+      i = 0
+      file.each_line { |line| quantcast_top_million += line; i+= 1; break if i > max_sites }
+    end
     quantcast_top_million.gsub(/^(\d+)\t(.*)$/) { |m|
       $quantcast_ranks[ $2 ] = $1
       m
