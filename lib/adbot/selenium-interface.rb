@@ -99,6 +99,7 @@ module SeleniumInterface
         handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
         l = browser.location
       end
+      l.gsub! /%2F/i, "/" # easiest for everyone if forward slashes are literal
       puts "link url (#{link_url}) had location::: #{l}"
       l
     end
@@ -146,6 +147,7 @@ module SeleniumInterface
           ad.link_url.sub! /^http%3A/i, "http:"
           ad.link_url.sub! /^http:%2F/i, "http:/"
           ad.link_url.sub! /^http:\/%2F/i, "http://"
+          ad.link_url.sub! /%2F/i, "/"
           puts "SCRAPED: #{ad.link_url}"
         end
         ad.link_url = "" if ad.link_url =~ /\s/ # naively don't allow URIs with whitespace. don't use URI.parse because some adnetworks use invalid URIs
