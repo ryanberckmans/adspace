@@ -19,6 +19,6 @@ s3 = RightAws::S3.new(File.read('../aws/access-key').strip,
 
 Screenshot.bucket = RightAws::S3::Bucket.new(s3, 'adchart_screenshots')
 
-ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')
+ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
 
 Adbot::run

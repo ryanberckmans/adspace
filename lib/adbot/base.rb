@@ -36,8 +36,6 @@ module Adbot
       puts "using sqs queue #{$SQS_QUEUE}" if $SQS_QUEUE
       require "core/sqs-interface.rb"
       
-      url_results = []
-
       consecutive_sleeps = 0
 
       loop do
@@ -61,9 +59,20 @@ module Adbot
         url_result = Adbot::scan_url( url_message.to_s, options )
 
         if url_result and not url_result.error_scanning
-          url_results << url_result
-          Adbot::output_tabular url_result, options
-          #Adbot::save_url( url_result, options )
+          begin
+            Adbot::output_tabular url_result, options
+          rescue Exception => e
+            puts e.backtrace
+            puts e.message
+            puts "failed to output scan to tabular"
+          end
+          begin
+            Adbot::save url_result
+          rescue Exception => e
+            puts e.backtrace
+            puts e.message
+            puts "failed to save scan to db"
+          end
         elsif url_result and url_result.error_scanning
           Adbot::output_error url_result, options
         end
