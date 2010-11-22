@@ -35,7 +35,7 @@ module Adbot
         to_write = ""
         tab = "\t"
         prefix =
-          url_result.date + tab +
+          url_result.scan_time.to_s + tab +
           url_result.url + tab +
           url_result.quantcast_rank + tab +
           url_result.domain + tab +

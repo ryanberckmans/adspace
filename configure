@@ -1,10 +1,10 @@
 #!/bin/bash
 
 if [ "`uname`" != "Linux" ]; then
-    echo "$0 installs the project dependencies on a debian machine"
+    echo "$0 installs the native project dependencies on a debian machine"
     exit
 fi
 
-sudo aptitude install ruby rubygems irb xvfb openssh-client libopenssl-ruby sqlite3 ruby1.8-dev libsqlite3-dev subversion
-sudo gem install selenium-client right_aws activerecord sqlite3-ruby json-pure
-svn checkout http://closure-library.googlecode.com/svn/trunk/ lib/closure-library
+sudo aptitude install ruby rubygems irb xvfb openssh-client libopenssl-ruby sqlite3 ruby1.8-dev libsqlite3-dev libxml2 libxslt
+
+# svn checkout http://closure-library.googlecode.com/svn/trunk/ lib/closure-library

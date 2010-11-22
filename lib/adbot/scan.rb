@@ -74,7 +74,7 @@ module Adbot
         url_result.page_width = SeleniumInterface::page_width browser
         url_result.page_height = SeleniumInterface::page_height browser
         url_result.title = SeleniumInterface::page_title browser
-        url_result.date = Time.now.to_f.to_s
+        url_result.scan_time = Time.now
 
         url_result.screenshot = SeleniumInterface::page_screenshot browser
         File.open("/tmp/#{url_result.url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue puts "failed to save screenshot"
