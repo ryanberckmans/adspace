@@ -44,7 +44,6 @@ module Adbot
       return unless u
       domain = u.domain
       path = u.path
-      path ||= "/"
       u = nil # not intended to be used again
 
       url_result = OpenStruct.new

@@ -49,6 +49,7 @@ module Util
   def self.decompose_url(url)
     uri = URI.parse(url) rescue OpenStruct.new
     return unless uri.scheme and uri.host
+    uri.path = "/" unless uri.path and uri.path.length > 0
     OpenStruct.new("domain" => "#{uri.scheme}://#{uri.host}",
                    "path" => uri.path)
   end
