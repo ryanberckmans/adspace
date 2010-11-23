@@ -9,6 +9,7 @@ require 'active_record'
 require 'right_aws'
 require 'yaml'
 
+require 'adabase/app/models/domain.rb'
 require 'adabase/app/models/scan.rb'
 require 'adabase/app/models/ad.rb'
 require 'adabase/app/models/screenshot.rb'

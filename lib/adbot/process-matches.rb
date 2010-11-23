@@ -36,7 +36,6 @@ module Adbot
         tab = "\t"
         prefix =
           url_result.scan_time.to_s + tab +
-          url_result.url + tab +
           url_result.quantcast_rank + tab +
           url_result.domain + tab +
           url_result.path + tab +

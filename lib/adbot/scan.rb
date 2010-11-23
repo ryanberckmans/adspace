@@ -48,7 +48,6 @@ module Adbot
       u = nil # not intended to be used again
 
       url_result = OpenStruct.new
-      url_result.url = url
       url_result.domain = domain
       url_result.path = path
       
@@ -77,7 +76,7 @@ module Adbot
         url_result.scan_time = Time.now
 
         url_result.screenshot = SeleniumInterface::page_screenshot browser
-        File.open("/tmp/#{url_result.url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue puts "failed to save screenshot"
+        File.open("/tmp/#{url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue puts "failed to save screenshot"
         
         follow_ad_link_urls( url_result.ads, browser, url_result.domain, options )
 
