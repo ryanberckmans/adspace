@@ -58,7 +58,11 @@ module Adbot
 
         url_result = Adbot::scan_url( url_message.to_s, options )
 
-        puts "scan failed for url #{url_message.to_s}" if (not url_result or url_result.exception)
+        if (not url_result or url_result.exception)
+          puts "scan failed for url #{url_message.to_s}"
+        else
+          puts "scan succeeded for url #{url_message.to_s}"
+        end
         
         begin
           Adbot::save url_result if url_result
