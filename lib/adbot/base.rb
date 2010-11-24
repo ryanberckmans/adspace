@@ -58,26 +58,15 @@ module Adbot
 
         url_result = Adbot::scan_url( url_message.to_s, options )
 
-        if url_result and not url_result.error_scanning
-          begin
-            Adbot::output_tabular url_result, options
-          rescue Exception => e
-            puts e.backtrace
-            puts e.message
-            puts "failed to output scan to tabular"
-          end
-          begin
-            Adbot::save url_result
-          rescue Exception => e
-            puts e.backtrace
-            puts e.message
-            puts "failed to save scan to db"
-          end
-        elsif url_result and url_result.error_scanning
-          Adbot::output_error url_result, options
-        end
+        puts "scan failed for url #{url_message.to_s}" if (not url_result or url_result.exception)
         
-        puts "scan failed for url #{url_message.to_s}" if (not url_result or url_result.error_scanning) and options.verbose
+        begin
+          Adbot::save url_result if url_result
+        rescue Exception => e
+          puts e.backtrace
+          puts e.message
+          puts "failed to save scan to db"
+        end
 
         AWS::SQS::done_with_next_url url_message
       end # loop do

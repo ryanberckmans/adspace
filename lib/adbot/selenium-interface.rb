@@ -32,13 +32,13 @@ module SeleniumInterface
       end
     end
 
-    def browser( url, selenium_host, selenium_port )
+    def browser( domain, selenium_host, selenium_port )
       begin
         browser = Selenium::Client::Driver.new \
         :host => selenium_host,
         :port => selenium_port,
         :browser => "*firefox",
-        :url => url,
+        :url => domain,
         :timeout_in_seconds => DEFAULT_TIMEOUT
 
         browser.start_new_browser_session

@@ -99,7 +99,6 @@ module Adbot
         # catch Timeout::Error, but re-raise Interrupt so that SIGnals work correctly.
         puts e.backtrace
         puts e.message
-        url_result.error_scanning = true
         url_result.exception = e
       rescue Interrupt, SystemExit => e
         puts "scan.rb: re-raising caught exception: #{e.class} (#{e.class.ancestors.join ","})"
