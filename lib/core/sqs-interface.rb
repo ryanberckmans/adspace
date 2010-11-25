@@ -37,10 +37,28 @@ module AWS
         @@url_queue.delete
       end
 
+      def push( message )
+        begin
+          @@url_queue.push message
+        rescue Exception =>e 
+          puts e.message
+          raise
+        end
+      end
+
       def push_url( url )
         begin
           @@url_queue.push url
         rescue Exception =>e 
+          puts e.message
+          raise
+        end
+      end
+
+      def next
+        begin
+          @@url_queue.receive
+        rescue Exception => e
           puts e.message
           raise
         end
@@ -55,9 +73,9 @@ module AWS
         end
       end
       
-      def done_with_next_url( url_message )
+      def done_with_next( message )
         begin
-          url_message.delete
+          message.delete
         rescue Exception => e
           puts e.message
         end

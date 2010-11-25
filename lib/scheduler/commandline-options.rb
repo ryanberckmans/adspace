@@ -5,6 +5,7 @@ module Scheduler
   def self.parse_options( argv )
     collected_options = OpenStruct.new
 
+    collected_options.urls = []
     collected_options.sqs_queue = nil
 
     opts = OptionParser.new do |opts|
@@ -14,6 +15,10 @@ module Scheduler
       
       opts.on("--sqs QUEUE", String, "required. use QUEUE instead of the default sqs queue") do |queue|
         collected_options.sqs_queue = queue
+      end
+
+      opts.on("--url URL", String, "optional. inject URL. use --url any number of times. each URL must be prefixed with transport protocol (i.e. http://)") do |url|
+        collected_options.urls.push url
       end
 
       opts.on_tail("-h", "--help", "Show this message") do

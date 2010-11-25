@@ -2,6 +2,15 @@
 
 $:.unshift File.expand_path(File.dirname(__FILE__) + "/../lib")
 
+require 'rubygems'
+require 'active_record'
+require 'yaml'
+
+require 'adabase/app/models/domain.rb'
+require 'adabase/app/models/scan.rb'
+
 require "scheduler/base.rb"
+
+ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
 
 Scheduler::run
