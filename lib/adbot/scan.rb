@@ -36,22 +36,27 @@ module Adbot
     end
 
     public
-    def scan_url( url, options )
+    def scan_url( scan_id, options )
+      begin
+        scan = Scan.find scan_id
+      rescue StandardError => e
+        puts e.backtrace
+        puts e.message
+        return nil
+      end
       
-      puts "scanning #{url}" if options.verbose
-
-      u = Util::decompose_url url
-      return unless u
-      domain = u.domain
-      path = u.path
-      u = nil # not intended to be used again
+      puts "scanning #{scan.domain.url + scan.path} scan_id #{scan_id}" if options.verbose
 
       url_result = OpenStruct.new
-      url_result.domain = domain
-      url_result.path = path
+      url_result.domain = scan.domain.url
+      url_result.path = scan.path
+
+      url_result.scan_time = Time.now
+
+      Util::quantcast_rank url_result
       
       begin
-        browser = SeleniumInterface::browser( domain, options.selenium_host, options.selenium_port )
+        browser = SeleniumInterface::browser( url_result.domain, options.selenium_host, options.selenium_port )
         raise unless browser
 
         if url_result.path.length > 0
@@ -72,14 +77,11 @@ module Adbot
         url_result.page_width = SeleniumInterface::page_width browser
         url_result.page_height = SeleniumInterface::page_height browser
         url_result.title = SeleniumInterface::page_title browser
-        url_result.scan_time = Time.now
 
         url_result.screenshot = SeleniumInterface::page_screenshot browser
-        File.open("/tmp/#{url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue puts "failed to save screenshot"
+        #File.open("/tmp/#{url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue puts "failed to save screenshot"
         
         follow_ad_link_urls( url_result.ads, browser, url_result.domain, options )
-
-        Util::quantcast_rank url_result
 
         url_result.html = nil
         url_result.screenshot = nil

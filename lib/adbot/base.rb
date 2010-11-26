@@ -40,14 +40,14 @@ module Adbot
 
       loop do
         begin
-          url_message = AWS::SQS::next_url
+          scan_id = AWS::SQS::next
         rescue Interrupt, SystemExit
           raise
         rescue Exception => e
-          url_message = nil
+          scan_id = nil
         end
 
-        if not url_message
+        if not scan_id
           time = sleep_time consecutive_sleeps
           consecutive_sleeps += 1 unless consecutive_sleeps == MAX_BACKOFF
           puts "sleeping for #{time} seconds" if options.verbose
@@ -56,23 +56,25 @@ module Adbot
           consecutive_sleeps = 0
         end
 
-        url_result = Adbot::scan_url( url_message.to_s, options )
+        url_result = Adbot::scan_url scan_id.to_s, options
 
-        if (not url_result or url_result.exception)
-          puts "scan failed for #{url_message.to_s}"
+        if not url_result
+          puts "scan failed scan_id #{scan_id.to_s}"
+        elsif url_result.exception
+          puts "scan failed for #{url_result.domain + url_result.path} scan_id #{scan_id.to_s}"
         else
-          puts "scan succeeded for #{url_message.to_s}"
+          puts "scan succeeded for #{url_result.domain + url_result.path} scan_id #{scan_id.to_s}"
         end
         
         begin
-          Adbot::save url_result if url_result
+          Adbot::save url_result, scan_id.to_s if url_result
         rescue Exception => e
           puts e.backtrace
           puts e.message
           puts "failed to save scan to db"
         end
 
-        AWS::SQS::done_with_next_url url_message
+        AWS::SQS::done_with_next scan_id
       end # loop do
     end # def run
   end # class << self

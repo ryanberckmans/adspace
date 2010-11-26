@@ -6,7 +6,7 @@ module Scheduler
   INTERVAL = 60 * 0.5
   DESIRED_INTERVALS = 4
   NEW_RATE_RATIO = 0.5
-  MINIMUM_QUEUE_SIZE = 20
+  MINIMUM_QUEUE_SIZE = 5
 
   def self.consumption_tracker( coroutine )
     previous_size = 0
@@ -28,7 +28,7 @@ module Scheduler
     added = 0
     domains = (Domain.find :all).select { |d| d.scans.size < 1 }
     domains.each do |domain|
-      scan_id = 0 #Scan.schedule domain, path
+      scan_id = Scan.schedule domain.url, "/"
       puts "#{domain.url} had no scans, scheduled scan with id #{scan_id}"
       added += 1
       scan_ids << scan_id
@@ -45,7 +45,19 @@ module Scheduler
   end
 
   def self.add_new_domains( new_scans )
-
+    puts "registering new domains"
+    quantcast_rank = 1
+    while new_scans > 0
+      domain = "http://" + $quantcast_ranks.index( quantcast_rank.to_s )
+      if Domain.find_by_url domain
+        puts "already registered #{domain} #{quantcast_rank}"
+      else
+        Domain.create({ :url => domain, :quantcast_rank => quantcast_rank })
+        puts "registered new domain #{domain} #{quantcast_rank}"
+        new_scans -= 1
+      end
+      quantcast_rank += 1
+    end
   end
 
   def self.inject( scan_ids )
@@ -64,10 +76,9 @@ module Scheduler
         puts "skipped #{url}"
         next
       end
-      scan_id = 0 #Scan.schedule u.domain, u.path
+      scan_id = Scan.schedule u.domain, u.path
       puts "scheduled #{url} with scan id #{scan_id}"
       scan_ids << scan_id
-      sleep 0.15 # don't hit sqs so hard. they can handle it but we crash sometimes
     end
     inject scan_ids
   end
@@ -81,6 +92,12 @@ module Scheduler
 
     manual_urls options.urls
 
+    puts "queue size: #{AWS::SQS::size}" if options.size
+
+    exit if options.bail
+
+    Util::init_quantcast
+
     consumption = Coroutine.new { |cr| consumption_tracker cr }
     
     while true
@@ -89,13 +106,12 @@ module Scheduler
       new_scans = consumption.resume
 
       scan_ids = []
-      puts "new scans #{new_scans}"
+      puts "adding #{new_scans} scans to the queue"
       while new_scans > 0
         new_scans -= domains_with_no_scans scan_ids, new_scans
         new_scans -= domains_another_scan scan_ids, new_scans
         new_scans -= domains_failed scan_ids, new_scans
-        add_new_domains new_scans
-        break
+        add_new_domains new_scans if new_scans > 0
       end
       inject scan_ids
     end
