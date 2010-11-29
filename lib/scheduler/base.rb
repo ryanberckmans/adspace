@@ -3,11 +3,16 @@ require "core/coroutine.rb"
 require Util.here "commandline-options.rb"
 
 module Scheduler
-  INTERVAL = 60 * 2
-  DESIRED_INTERVALS = 4
-  NEW_RATE_RATIO = 0.5
-  MINIMUM_QUEUE_SIZE = 20
-  SIX_HOURS = 60 * 60 * 6
+  INTERVAL = 60 * 5
+  DESIRED_INTERVALS = 10
+  NEW_RATE_RATIO = 0.35
+  MINIMUM_QUEUE_SIZE = 12
+  HOUR = 60 * 60
+  DAY = HOUR * 24
+  WEEK = DAY * 7
+  RESCAN_NO_ADS = WEEK
+  RESCAN_HAS_ADS = DAY * 2
+  RESCAN_FAIL = WEEK
 
   def self.consumption_tracker( coroutine )
     previous_size = 0
@@ -36,7 +41,7 @@ module Scheduler
 
   def self.inflight( scan_ids, max_size )
     return unless scan_ids.size < max_size
-    uncompleted = Scan.find :all, :conditions => [ "scan_completed = ? and updated_at < ?", false, Time.now - 60 * 60 * 6  ]
+    uncompleted = Scan.find :all, :conditions => [ "scan_completed = ? and updated_at < ?", false, Time.now - HOUR * 6  ]
     uncompleted.each do |scan|
       break unless scan_ids.size < max_size
       scan.touch
@@ -47,10 +52,23 @@ module Scheduler
 
   def self.rescan( scan_ids, max_size )
     return unless scan_ids.size < max_size
-  end
-
-  def self.failed( scan_ids, max_size )
-    return unless scan_ids.size < max_size
+    scans = Scan.find :all, :order => "updated_at DESC", :group => [ :path, :domain_id ], :conditions => [ "scan_completed = ? ", true ]
+    (scans.sort_by { |s| s.updated_at }).each do |scan|
+      break unless scan_ids.size < max_size
+      next_scan = scan.updated_at
+      if scan.scan_fail
+        next_scan += RESCAN_FAIL
+      elsif scan.ads.size > 0
+        next_scan += RESCAN_HAS_ADS
+      else
+        next_scan += RESCAN_NO_ADS
+      end
+      if next_scan < Time.now
+        scan_id = Scan.schedule scan.domain.url, scan.path
+        puts "scheduled #{scan_id}, #{scan.domain.url}#{scan.path} rescan (#{scan.ads.size} ads, last #{scan.updated_at})"
+        scan_ids << scan_id
+      end
+    end
   end
 
   def self.new_domains( max )
@@ -127,7 +145,6 @@ module Scheduler
         inflight scan_ids, max_size
         never_scanned scan_ids, max_size
         rescan scan_ids, max_size
-        failed scan_ids, max_size
         new_domains max_size - scan_ids.size
       end
       inject scan_ids

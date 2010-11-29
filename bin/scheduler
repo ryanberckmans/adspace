@@ -8,6 +8,8 @@ require 'yaml'
 
 require 'adabase/app/models/domain.rb'
 require 'adabase/app/models/scan.rb'
+require 'adabase/app/models/scan_fail.rb'
+require 'adabase/app/models/ad.rb'
 
 require "scheduler/base.rb"
 
