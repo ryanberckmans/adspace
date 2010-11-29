@@ -3,10 +3,11 @@ require "core/coroutine.rb"
 require Util.here "commandline-options.rb"
 
 module Scheduler
-  INTERVAL = 60 * 0.5
+  INTERVAL = 60 * 2
   DESIRED_INTERVALS = 4
   NEW_RATE_RATIO = 0.5
-  MINIMUM_QUEUE_SIZE = 5
+  MINIMUM_QUEUE_SIZE = 20
+  SIX_HOURS = 60 * 60 * 6
 
   def self.consumption_tracker( coroutine )
     previous_size = 0
@@ -15,46 +16,53 @@ module Scheduler
       previous_size = AWS::SQS::size rescue previous_size
       coroutine.yield
       size = AWS::SQS::size rescue previous_size
-      puts previous_size
-      puts size
       consumption_rate = consumption_rate * NEW_RATE_RATIO + (previous_size - size) * (1 - NEW_RATE_RATIO)
-      puts "consumption_rate: #{consumption_rate}"
+      puts "consumption_rate: #{consumption_rate}, queue size: #{size}"
       increase_queue_by = DESIRED_INTERVALS * [consumption_rate,0.0].max - size
       coroutine.yield [increase_queue_by.to_i,0,MINIMUM_QUEUE_SIZE - size].max
     end
   end
 
-  def self.domains_with_no_scans( scan_ids, new_scans )
-    added = 0
+  def self.never_scanned( scan_ids, max_size )
+    return unless scan_ids.size < max_size
     domains = (Domain.find :all).select { |d| d.scans.size < 1 }
     domains.each do |domain|
+      break unless scan_ids.size < max_size
       scan_id = Scan.schedule domain.url, "/"
-      puts "#{domain.url} had no scans, scheduled scan with id #{scan_id}"
-      added += 1
+      puts "scheduled #{scan_id}, #{domain.url} has never been scanned"
       scan_ids << scan_id
     end
-    added
   end
 
-  def self.domains_another_scan( scan_ids, new_scans )
-    0
+  def self.inflight( scan_ids, max_size )
+    return unless scan_ids.size < max_size
+    uncompleted = Scan.find :all, :conditions => [ "scan_completed = ? and updated_at < ?", false, Time.now - 60 * 60 * 6  ]
+    uncompleted.each do |scan|
+      break unless scan_ids.size < max_size
+      scan.touch
+      puts "scheduled #{scan.id}, this scan was never completed"
+      scan_ids << scan.id
+    end
   end
 
-  def self.domains_failed( scan_ids, new_scans )
-    0
+  def self.rescan( scan_ids, max_size )
+    return unless scan_ids.size < max_size
   end
 
-  def self.add_new_domains( new_scans )
-    puts "registering new domains"
+  def self.failed( scan_ids, max_size )
+    return unless scan_ids.size < max_size
+  end
+
+  def self.new_domains( max )
     quantcast_rank = 1
-    while new_scans > 0
+    while max > 0
       domain = "http://" + $quantcast_ranks.index( quantcast_rank.to_s )
       if Domain.find_by_url domain
-        puts "already registered #{domain} #{quantcast_rank}"
+        # domain already exists
       else
         Domain.create({ :url => domain, :quantcast_rank => quantcast_rank })
-        puts "registered new domain #{domain} #{quantcast_rank}"
-        new_scans -= 1
+        puts "registered domain #{domain} #{quantcast_rank}"
+        max -= 1
       end
       quantcast_rank += 1
     end
@@ -94,6 +102,13 @@ module Scheduler
 
     puts "queue size: #{AWS::SQS::size}" if options.size
 
+    if options.clear
+      AWS::SQS::clear rescue nil
+      msg = "queue cleared"
+      msg += " #{$SQS_QUEUE}" if $SQS_QUEUE
+      puts msg
+    end
+
     exit if options.bail
 
     Util::init_quantcast
@@ -102,18 +117,21 @@ module Scheduler
     
     while true
       consumption.resume
+      puts "sleeping\n---------------------"
       sleep INTERVAL
-      new_scans = consumption.resume
+      max_size = consumption.resume
 
       scan_ids = []
-      puts "adding #{new_scans} scans to the queue"
-      while new_scans > 0
-        new_scans -= domains_with_no_scans scan_ids, new_scans
-        new_scans -= domains_another_scan scan_ids, new_scans
-        new_scans -= domains_failed scan_ids, new_scans
-        add_new_domains new_scans if new_scans > 0
+      puts "queue requires additional #{max_size}"
+      while scan_ids.size < max_size
+        inflight scan_ids, max_size
+        never_scanned scan_ids, max_size
+        rescan scan_ids, max_size
+        failed scan_ids, max_size
+        new_domains max_size - scan_ids.size
       end
       inject scan_ids
+      puts "#{scan_ids.size} (max #{max_size}) added to the queue"
     end
   end
 end

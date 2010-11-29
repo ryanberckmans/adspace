@@ -5,6 +5,6 @@ module Adbot
     attrs.merge!({:scan_completed => true})
     scan = Scan.find scan_id
     raise "scan #{scan_id} was already completed" if scan.scan_completed
-    raise unless scan.update_attributes attrs
+    raise "scan.update_attributes failed" unless scan.update_attributes attrs
   end
 end

@@ -28,9 +28,6 @@ module Util
     result_domain = url_result.domain.sub(/http:\/\//, "")
     $quantcast_ranks.each_pair { |domain,rank|
       if result_domain == domain
-        puts result_domain
-        puts domain
-        puts rank
         url_result.quantcast_rank = rank
         return
       end

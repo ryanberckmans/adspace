@@ -44,16 +44,24 @@ module Adbot
         puts e.message
         return nil
       end
-      
-      puts "scanning #{scan.domain.url + scan.path} scan_id #{scan_id}" if options.verbose
 
+      if not scan.domain or not scan.domain.url
+        puts "scan #{scan_id} had no associated domain"
+        return nil
+      end
+      
       url_result = OpenStruct.new
       url_result.domain = scan.domain.url
       url_result.path = scan.path
+      if not url_result.path or url_result.path.length < 1
+        url_result.path = "/"
+      end
 
       url_result.scan_time = Time.now
 
       Util::quantcast_rank url_result
+
+      puts "scanning #{url_result.domain + url_result.path} scan_id #{scan_id}"
       
       begin
         browser = SeleniumInterface::browser( url_result.domain, options.selenium_host, options.selenium_port )

@@ -8,6 +8,7 @@ module Scheduler
     collected_options.urls = []
     collected_options.sqs_queue = nil
     collected_options.size = false
+    collected_options.clear = false
     collected_options.bail = false
 
     opts = OptionParser.new do |opts|
@@ -25,6 +26,11 @@ module Scheduler
 
       opts.on("-s", "--size", "optional. return the current size of the queue and then exit") do
         collected_options.size = true
+        collected_options.bail = true
+      end
+
+      opts.on("-c", "--clear-queue", "optional. clear the queue and then exit") do
+        collected_options.clear = true
         collected_options.bail = true
       end
 

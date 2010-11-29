@@ -65,13 +65,13 @@ module Adbot
         else
           puts "scan succeeded for #{url_result.domain + url_result.path} scan_id #{scan_id.to_s}"
         end
-        
+
         begin
-          Adbot::save url_result, scan_id.to_s if url_result
+          Adbot::save url_result, scan_id.to_s if url_result # not ::save clobbers the url_result struct
         rescue Exception => e
           puts e.backtrace
           puts e.message
-          puts "failed to save scan to db"
+          puts "failed to save scan #{scan_id.to_s} to db"
         end
 
         AWS::SQS::done_with_next scan_id
