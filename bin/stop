@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./schedulerd stop
+./adbotd stop
+./seleniumd stop

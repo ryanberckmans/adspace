@@ -3,7 +3,7 @@ require "core/coroutine.rb"
 require Util.here "commandline-options.rb"
 
 module Scheduler
-  INTERVAL = 60 * 5
+  INTERVAL = 60 * 2
   DESIRED_INTERVALS = 10
   NEW_RATE_RATIO = 0.35
   MINIMUM_QUEUE_SIZE = 12
@@ -72,17 +72,37 @@ module Scheduler
   end
 
   def self.new_domains( max )
-    quantcast_rank = 1
+    return unless max > 0
+    
+    search_min = 0
+    search_max = $quantcast_order.size
+    while true
+      puts "domain binary search, search min #{search_min} search max #{search_max}"
+      search_mid = (search_min + search_max) / 2
+      if Domain.find_by_url("http://" + $quantcast_order[ search_mid ] )
+        puts "domain at #{search_mid}"
+        search_min = search_mid + 1
+      else
+        puts "nil at #{search_mid}"
+        search_max = search_mid - 1
+      end
+      break if search_max - search_min < 4
+    end # this binary search algorithm bounds the number of database calls to find the next un-registered domain with lowest quantcast_rank
+    puts "new domain binary search terminated at #{search_min}"
+    
+    quantcast_index = search_min
     while max > 0
-      domain = "http://" + $quantcast_ranks.index( quantcast_rank.to_s )
+      raw_domain = $quantcast_order [ quantcast_index ]
+      domain = "http://" + raw_domain
       if Domain.find_by_url domain
         # domain already exists
       else
+        quantcast_rank = $quantcast_ranks[ raw_domain ]
         Domain.create({ :url => domain, :quantcast_rank => quantcast_rank })
         puts "registered domain #{domain} #{quantcast_rank}"
         max -= 1
       end
-      quantcast_rank += 1
+      quantcast_index += 1
     end
   end
 

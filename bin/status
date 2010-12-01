@@ -1,0 +1,5 @@
+#!/bin/sh
+
+seleniumd status
+schedulerd status
+adbotd status

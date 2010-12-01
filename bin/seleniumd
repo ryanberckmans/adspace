@@ -6,5 +6,6 @@ require 'daemons'
 pwd = Dir.pwd
 Daemons.run_proc( 'selenium-server', { :multiple => false }) do
   Dir.chdir pwd
-  exec "selenium"
+  at_exit { system "ps -eF | grep java | grep 'selenium-server' | grep -v 'grep' | sed 's/^[^[:digit:]]*\\([[:digit:]]*\\).*/\\1/' | xargs kill " }
+  system "./selenium"
 end

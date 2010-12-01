@@ -14,9 +14,11 @@ module Util
 
   def self.init_quantcast
     $quantcast_ranks = {}
+    $quantcast_order = []
     quantcast_top_million = File.read( here("../../data/quantcast-top-million.txt") )
     quantcast_top_million.gsub(/^(\d+)\t(.*)$/) { |m|
       $quantcast_ranks[ $2 ] = $1
+      $quantcast_order << $2
       m
     }
   end
