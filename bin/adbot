@@ -4,6 +4,10 @@ $:.unshift File.expand_path(File.dirname(__FILE__) + "/../lib")
 
 require "adbot/base.rb"
 
+options = Adbot::parse_options( ARGV )
+
+Dir.chdir options.pwd if options.pwd
+
 # persistence
 require 'active_record'
 require 'right_aws'
@@ -23,4 +27,4 @@ Screenshot.bucket = RightAws::S3::Bucket.new(s3, 'adchart_screenshots')
 
 ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
 
-Adbot::run
+Adbot::run options

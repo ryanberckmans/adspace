@@ -109,9 +109,7 @@ module Scheduler
     inject scan_ids
   end
 
-  def self.run
-    options = Scheduler::parse_options ARGV
-
+  def self.run( options )
     $SQS_QUEUE = options.sqs_queue
     puts "using sqs queue #{$SQS_QUEUE}" if $SQS_QUEUE
     require "core/sqs-interface.rb"

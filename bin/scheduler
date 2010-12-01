@@ -13,6 +13,10 @@ require 'adabase/app/models/ad.rb'
 
 require "scheduler/base.rb"
 
+options = Scheduler::parse_options ARGV
+
+Dir.chdir options.pwd if options.pwd
+
 ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
 
-Scheduler::run
+Scheduler::run options

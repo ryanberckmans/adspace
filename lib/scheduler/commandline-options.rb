@@ -10,6 +10,7 @@ module Scheduler
     collected_options.size = false
     collected_options.clear = false
     collected_options.bail = false
+    collected_options.pwd = nil
 
     opts = OptionParser.new do |opts|
       opts.banner = "Usage: scheduler [options]"
@@ -36,6 +37,10 @@ module Scheduler
 
       opts.on("-b", "--bail", "optional. perform initial tasks but do not execute scheduler main loop") do
         collected_options.bail = true
+      end
+
+      opts.on("--pwd PWD", "optional. set the present working directory to pwd") do |pwd|
+        collected_options.pwd = pwd
       end
 
       opts.on_tail("-h", "--help", "Show this message") do

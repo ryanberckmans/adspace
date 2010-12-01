@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'daemons'
+
+pwd = Dir.pwd
+Daemons.run_proc( 'selenium-server', { :multiple => false }) do
+  Dir.chdir pwd
+  exec "selenium"
+end
