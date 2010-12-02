@@ -27,8 +27,9 @@ module SeleniumInterface
       begin
         browser.close_current_browser_session if browser
       rescue Exception => e
-        puts e.message
-        puts "error ending browser session"
+        Log::error e.backtrace.join "\t"
+        Log::error "#{e.class} " + e.message
+        Log::error "error ending browser session"
       end
     end
 
@@ -53,12 +54,10 @@ module SeleniumInterface
     def handle_timeout
       begin
         yield
-        $timed_out = false
       rescue Selenium::CommandError => e
         if e.message =~ /Timed out after/
-          puts e.message
-          puts "selenium timed out, attempting to continue operation"
-          $timed_out = true
+          Log::warn "#{e.class} " + e.message
+          Log::warn "selenium timed out, attempting to continue operation"
         else
           raise
         end
@@ -95,12 +94,12 @@ module SeleniumInterface
       handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
       l = browser.location
       if l == "about:blank"
-        puts "location was about:blank, waiting longer..."
+        Log::info "location was about:blank, waiting longer..."
         handle_timeout { browser.wait_for_page_to_load MINI_PAGE_TIMEOUT }
         l = browser.location
       end
       l.gsub! /%2F/i, "/" # easiest for everyone if forward slashes are literal
-      puts "link url (#{link_url}) had location::: #{l}"
+      Log::info "link url (#{link_url}) had location::: #{l}"
       l
     end
 
@@ -124,7 +123,7 @@ module SeleniumInterface
 
     def get_ad_frames( browser )
       frame_names = on browser, "adbot.frame_names"
-      puts "frame names: #{frame_names}"
+      Log::debug "frame names: #{frame_names}"
       frame_names.split ","
     end
 
@@ -142,13 +141,13 @@ module SeleniumInterface
 
         ad.link_url = on browser, "adbot.current_ad.link_url"
         if ad.link_url =~ /SCRAPEME/
-          puts "SCRAPME: trying to scrape from #{ad.link_url}"
+          Log::debug "SCRAPME: trying to scrape from #{ad.link_url}"
           ad.link_url = (ad.link_url.scan /clicktag.*?(http.*?)(;|'|")/i)[0][0] rescue ""
           ad.link_url.sub! /^http%3A/i, "http:"
           ad.link_url.sub! /^http:%2F/i, "http:/"
           ad.link_url.sub! /^http:\/%2F/i, "http://"
           ad.link_url.sub! /%2F/i, "/"
-          puts "SCRAPED: #{ad.link_url}"
+          Log::debug "SCRAPED: #{ad.link_url}"
         end
         ad.link_url = "" if ad.link_url =~ /\s/ # naively don't allow URIs with whitespace. don't use URI.parse because some adnetworks use invalid URIs
         ad.link_url = "" if ad.link_url.length < 10 # naively don't allow short link_urls
@@ -160,8 +159,8 @@ module SeleniumInterface
         ad.screenshot_width = (on browser, "adbot.current_ad.screenshot_width").to_f
         ad.screenshot_height = (on browser, "adbot.current_ad.screenshot_height").to_f
         
-        puts "found a next ad in browser:"
-        puts ad
+        Log::info "found a next ad in browser:"
+        Log::info ad
       end
 
       on browser, "adbot.highlight_ads()"
@@ -172,13 +171,13 @@ module SeleniumInterface
     def get_ads( browser )
       ads = get_ads_in_current_frame browser
       (get_ad_frames browser).each do |frame|
-        puts "entering frame #{frame}"
+        Log::debug "entering frame #{frame}"
         browser.select_frame frame
         include_browser_util browser
         on browser, "ADBOTjQuery('a,iframe,object,embed').addClass(this.browserbot.getUserWindow().adbot.ad_class)"
         ads.concat(get_ads browser)
         browser.select_frame "relative=up"
-        puts "exited frame #{frame}"
+        Log::debug "exited frame #{frame}"
       end
       ads
     end

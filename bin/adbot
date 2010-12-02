@@ -8,7 +8,6 @@ Dir.chdir options.pwd if options.pwd
 Log::get "adbot", { :default => true, :level => Logger::DEBUG }
 Log::info "initialized", "adbot"
 
-
 # persistence
 require 'active_record'
 require 'right_aws'
@@ -22,10 +21,17 @@ require 'adabase/app/models/screenshot.rb'
 require 'adabase/app/models/ad_image.rb'
 
 s3 = RightAws::S3.new(File.read('../aws/access-key').strip,
-                      File.read('../aws/secret-access-key').strip)
+                      File.read('../aws/secret-access-key').strip,
+                      { :logger => Log::get } )
 
 Screenshot.bucket = RightAws::S3::Bucket.new(s3, 'adchart_screenshots')
 
 ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
 
-Adbot::run options
+begin
+  Adbot::run options
+rescue Exception => e
+  Log::fatal "uncaught exception #{e.class}", "adbot"
+  Log::fatal e.backtrace.join "\t"
+  Log::fatal e.message if e.message.length > 0 
+end

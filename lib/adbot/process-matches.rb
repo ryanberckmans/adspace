@@ -20,11 +20,11 @@ module Adbot
         file_path = options.output_dir + ".error" # output dir is treated as a file path when using output_tabular
         f = File.open file_path, "a"
         f.write to_write
-        puts "wrote error details for #{url_result.url} to #{file_path}" if options.verbose
+        Log::info "wrote error details for #{url_result.url} to #{file_path}"
       rescue Exception => e
-        puts e.backtrace
-        puts e.message
-        puts "failed to write error details to #{options.output_dir}.error for #{url_result.url}"
+        Log::error e.backtrace.join "\t"
+        Log::error e.message
+        Log::error "#{e.class} failed to write error details to #{options.output_dir}.error for #{url_result.url}"
       ensure
         f.close rescue nil
       end
@@ -62,11 +62,11 @@ module Adbot
         file_path = options.output_dir # output dir is treated as a file path when using output_tabular
         f = File.open file_path, "a"
         f.write to_write
-        puts "wrote results for #{url_result.url} to #{file_path}" if options.verbose
+        Log::info "wrote results for #{url_result.url} to #{file_path}"
       rescue Exception => e
-        puts e.backtrace
-        puts e.message
-        puts "failed to write to #{options.output_dir} for #{url_result.url}"
+        Log::error e.backtrace.join "\t"
+        Log::error e.message
+        Log::error "#{e.class} failed to write to #{options.output_dir} for #{url_result.url}"
       ensure
         f.close rescue nil
       end

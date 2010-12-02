@@ -19,4 +19,10 @@ Log::info "initialized", "scheduler"
 
 ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
 
-Scheduler::run options
+begin
+  Scheduler::run options
+rescue Exception => e
+  Log::fatal "uncaught exception #{e.class}", "scheduler"
+  Log::fatal e.backtrace.join "\t"
+  Log::fatal e.message if e.message.length > 0 
+end

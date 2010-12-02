@@ -40,10 +40,6 @@ module Adbot
           collected_options.selenium_port = port
         end
 
-        opts.on("-v", "--verbose", "optional. verbose mode") do
-          collected_options.verbose = true
-        end
-        
         opts.on("-b", "--bail", "optional. read commandline options but exit instead of running adbot") do
           collected_options.bail = true
         end

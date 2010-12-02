@@ -13,64 +13,50 @@ module AWS
     #  in rare cases, a recieved message   i) may have already been deleted  ii) may be within its visibility timeout
     #   it is our responsibility to handle redundant/duplicate messages
 
-    URL_QUEUE = $SQS_QUEUE || "url-queue"
-    URL_QUEUE_VISIBILITY = 180 # seconds
+    QUEUE_NAME = $SQS_QUEUE || "scan-queue"
+    QUEUE_VISIBILITY = 180 # seconds
 
     class << self
 
       begin
         @@sqs = RightAws::SqsGen2.new( AWS::access_key, AWS::secret_access_key, { :logger => Log::get } )
       rescue Exception => e
-        puts e.message
-        puts "error creating sqs connection"
+        Log::error e.backtrace.join "\t"
+        Log::error "#{e.class} " + e.message
+        Log::error "error creating sqs connection"
         raise
       end
 
       begin
-        @@url_queue = @@sqs.queue(URL_QUEUE, true, URL_QUEUE_VISIBILITY)
+        @@queue = @@sqs.queue(QUEUE_NAME, true, QUEUE_VISIBILITY)
       rescue Exception => e
-        puts e.message
-        puts "error creating/retrieving url queue"
+        Log::error e.backtrace.join "\t"
+        Log::error "#{e.class} " + e.message
+        Log::error "error creating/retrieving queue"
         raise
       end
 
       def clear
-        @@url_queue.delete
+        @@queue.delete
       end
 
       def push( message )
         begin
-          @@url_queue.push message
-        rescue Exception =>e 
-          puts e.message
-          raise
-        end
-      end
-
-      def push_url( url )
-        begin
-          @@url_queue.push url
-        rescue Exception =>e 
-          puts e.message
+          @@queue.push message
+        rescue Exception =>e
+          Log::error e.backtrace.join "\t"
+          Log::error "#{e.class} " + e.message
           raise
         end
       end
 
       def next
         begin
-          @@url_queue.receive
+          @@queue.receive
         rescue Exception => e
-          puts e.message
-          raise
-        end
-      end
-      
-      def next_url
-        begin
-          @@url_queue.receive
-        rescue Exception => e
-          puts e.message
-          raise
+          Log::error e.backtrace.join "\t"
+          Log::error "#{e.class} " + e.message
+          nil
         end
       end
       
@@ -78,12 +64,13 @@ module AWS
         begin
           message.delete
         rescue Exception => e
-          puts e.message
+          Log::error e.backtrace.join "\t"
+          Log::error "#{e.class} " + e.message
         end
       end
 
       def size
-        @@url_queue.size
+        @@queue.size
       end
       
     end # class << self
