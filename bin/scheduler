@@ -12,10 +12,10 @@ require 'adabase/app/models/scan_fail.rb'
 require 'adabase/app/models/ad.rb'
 
 require "scheduler/base.rb"
-
 options = Scheduler::parse_options ARGV
-
 Dir.chdir options.pwd if options.pwd
+Log::get "scheduler", { :default => true, :level => Logger::DEBUG }
+Log::info "initialized", "scheduler"
 
 ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
 

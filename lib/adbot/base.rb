@@ -1,3 +1,4 @@
+require "core/log.rb"
 require "core/util.rb"
 require Util.here "commandline-options.rb"
 require Util.here "scan.rb"

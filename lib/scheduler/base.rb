@@ -1,9 +1,10 @@
+require "core/log.rb"
 require "core/util.rb"
 require "core/coroutine.rb"
 require Util.here "commandline-options.rb"
 
 module Scheduler
-  INTERVAL = 60 * 2
+  INTERVAL = 60 * 0.5
   DESIRED_INTERVALS = 10
   NEW_RATE_RATIO = 0.35
   MINIMUM_QUEUE_SIZE = 12
@@ -22,7 +23,7 @@ module Scheduler
       coroutine.yield
       size = AWS::SQS::size rescue previous_size
       consumption_rate = consumption_rate * NEW_RATE_RATIO + (previous_size - size) * (1 - NEW_RATE_RATIO)
-      puts "consumption_rate: #{consumption_rate}, queue size: #{size}"
+      Log::info "consumption_rate: #{consumption_rate}, queue size: #{size}", "scheduler"
       increase_queue_by = DESIRED_INTERVALS * [consumption_rate,0.0].max - size
       coroutine.yield [increase_queue_by.to_i,0,MINIMUM_QUEUE_SIZE - size].max
     end
@@ -34,7 +35,7 @@ module Scheduler
     domains.each do |domain|
       break unless scan_ids.size < max_size
       scan_id = Scan.schedule domain.url, "/"
-      puts "scheduled #{scan_id}, #{domain.url} has never been scanned"
+      Log::info "scheduled #{scan_id}, #{domain.url} has never been scanned", "scheduler"
       scan_ids << scan_id
     end
   end
@@ -45,7 +46,7 @@ module Scheduler
     uncompleted.each do |scan|
       break unless scan_ids.size < max_size
       scan.touch
-      puts "scheduled #{scan.id}, this scan was never completed"
+      Log::info "scheduled #{scan.id}, this scan was never completed", "scheduler"
       scan_ids << scan.id
     end
   end
@@ -65,7 +66,7 @@ module Scheduler
       end
       if next_scan < Time.now
         scan_id = Scan.schedule scan.domain.url, scan.path
-        puts "scheduled #{scan_id}, #{scan.domain.url}#{scan.path} rescan (#{scan.ads.size} ads, last #{scan.updated_at})"
+        Log::info "scheduled #{scan_id}, #{scan.domain.url}#{scan.path} rescan (#{scan.ads.size} ads, last #{scan.updated_at})", "scheduler"
         scan_ids << scan_id
       end
     end
@@ -77,18 +78,18 @@ module Scheduler
     search_min = 0
     search_max = $quantcast_order.size
     while true
-      puts "domain binary search, search min #{search_min} search max #{search_max}"
+      Log::debug "domain binary search, search min #{search_min} search max #{search_max}", "scheduler"
       search_mid = (search_min + search_max) / 2
       if Domain.find_by_url("http://" + $quantcast_order[ search_mid ] )
-        puts "domain at #{search_mid}"
+        Log::debug "domain at #{search_mid}", "scheduler"
         search_min = search_mid + 1
       else
-        puts "nil at #{search_mid}"
+        Log::debug "nil at #{search_mid}", "scheduler"
         search_max = search_mid - 1
       end
       break if search_max - search_min < 4
     end # this binary search algorithm bounds the number of database calls to find the next un-registered domain with lowest quantcast_rank
-    puts "new domain binary search terminated at #{search_min}"
+    Log::debug "new domain binary search terminated at #{search_min}", "scheduler"
     
     quantcast_index = search_min
     while max > 0
@@ -99,7 +100,7 @@ module Scheduler
       else
         quantcast_rank = $quantcast_ranks[ raw_domain ]
         Domain.create({ :url => domain, :quantcast_rank => quantcast_rank })
-        puts "registered domain #{domain} #{quantcast_rank}"
+        Log::info "registered domain #{domain} #{quantcast_rank}", "scheduler"
         max -= 1
       end
       quantcast_index += 1
@@ -109,21 +110,21 @@ module Scheduler
   def self.inject( scan_ids )
     scan_ids.each do |scan_id|
       AWS::SQS::push scan_id
-      puts "injected scan_id #{scan_id}"
+      Log::info "injected scan_id #{scan_id}", "scheduler"
     end
   end
 
   def self.manual_urls( urls )
-    puts "manually scheduling urls:" if urls.length > 0
+    Log::info "manually scheduling urls:", "scheduler" if urls.length > 0
     scan_ids = []
     urls.each do |url|
       u = Util::decompose_url url
       if not u
-        puts "skipped #{url}"
+        Log::debug "skipped #{url}", "scheduler"
         next
       end
       scan_id = Scan.schedule u.domain, u.path
-      puts "scheduled #{url} with scan id #{scan_id}"
+      Log::info "scheduled #{url} with scan id #{scan_id}", "scheduler"
       scan_ids << scan_id
     end
     inject scan_ids
@@ -131,7 +132,7 @@ module Scheduler
 
   def self.run( options )
     $SQS_QUEUE = options.sqs_queue
-    puts "using sqs queue #{$SQS_QUEUE}" if $SQS_QUEUE
+    Log::info "using sqs queue #{$SQS_QUEUE}" if $SQS_QUEUE
     require "core/sqs-interface.rb"
 
     manual_urls options.urls
@@ -153,12 +154,12 @@ module Scheduler
     
     while true
       consumption.resume
-      puts "sleeping\n---------------------"
+      Log::info "sleeping", "scheduler"
       sleep INTERVAL
       max_size = consumption.resume
 
       scan_ids = []
-      puts "queue requires additional #{max_size}"
+      Log::info "queue requires additional #{max_size}", "scheduler"
       while scan_ids.size < max_size
         inflight scan_ids, max_size
         never_scanned scan_ids, max_size
@@ -166,7 +167,7 @@ module Scheduler
         new_domains max_size - scan_ids.size
       end
       inject scan_ids
-      puts "#{scan_ids.size} (max #{max_size}) added to the queue"
+      Log::info "#{scan_ids.size} (max #{max_size}) added to the queue", "scheduler"
     end
   end
 end

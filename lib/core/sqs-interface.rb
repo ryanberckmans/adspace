@@ -1,9 +1,10 @@
+require "core/log.rb"
 require "core/util.rb"
 require "rubygems"
 require "right_aws"
 require Util.here "aws-interface.rb"
 
-Rightscale::HttpConnection::params = { :http_connection_retry_delay=>5, :http_connection_retry_count=>3, :http_connection_open_timeout=>5, :http_connection_read_timeout=>1200}
+Rightscale::HttpConnection::params = { :http_connection_retry_delay=>5, :http_connection_retry_count=>3, :http_connection_open_timeout=>5, :http_connection_read_timeout=>1200, :logger => Log::get }
 
 module AWS
   module SQS
@@ -18,7 +19,7 @@ module AWS
     class << self
 
       begin
-        @@sqs = RightAws::SqsGen2.new( AWS::access_key, AWS::secret_access_key )
+        @@sqs = RightAws::SqsGen2.new( AWS::access_key, AWS::secret_access_key, { :logger => Log::get } )
       rescue Exception => e
         puts e.message
         puts "error creating sqs connection"
