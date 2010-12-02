@@ -4,7 +4,7 @@ require "core/coroutine.rb"
 require Util.here "commandline-options.rb"
 
 module Scheduler
-  INTERVAL = 60 * 2
+  INTERVAL = 60 * 5
   DESIRED_INTERVALS = 10
   NEW_RATE_RATIO = 0.35
   MINIMUM_QUEUE_SIZE = 12
