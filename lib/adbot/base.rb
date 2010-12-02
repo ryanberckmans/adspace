@@ -15,8 +15,7 @@ module Adbot
       BASE_POLL_FREQUENCY * 2 ** consecutive_sleeps
     end
     
-    def run
-      options = Adbot::parse_options( ARGV )
+    def run( options )
       
       abort unless options
 
