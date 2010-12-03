@@ -4,7 +4,7 @@ require "core/coroutine.rb"
 require Util.here "commandline-options.rb"
 
 module Scheduler
-  INTERVAL = 60 * 5
+  INTERVAL = 60 * 1
   DESIRED_INTERVALS = 10
   NEW_RATE_RATIO = 0.35
   MINIMUM_QUEUE_SIZE = 12
@@ -53,20 +53,24 @@ module Scheduler
 
   def self.rescan( scan_ids, max_size )
     return unless scan_ids.size < max_size
-    scans = Scan.find :all, :order => "updated_at DESC", :group => [ :path, :domain_id ], :conditions => [ "scan_completed = ? ", true ]
-    (scans.sort_by { |s| s.updated_at }).each do |scan|
-      break unless scan_ids.size < max_size
-      next_scan = scan.updated_at
+    scans = Scan.find :all, :order => "updated_at DESC", :group => [ :path, :domain_id ]
+    new_scan_time = {}
+    scans.each do |scan|
       if scan.scan_fail
-        next_scan += RESCAN_FAIL
+        new_scan_time[ scan.id ] = scan.updated_at + RESCAN_FAIL
       elsif scan.ads.size > 0
-        next_scan += RESCAN_HAS_ADS
+        new_scan_time[ scan.id ] = scan.updated_at + RESCAN_HAS_ADS
       else
-        next_scan += RESCAN_NO_ADS
+        new_scan_time[ scan.id ] = scan.updated_at + RESCAN_NO_ADS
       end
-      if next_scan < Time.now
+    end
+    
+    (scans.sort_by { |s| new_scan_time[s.id] }).each do |scan|
+      break unless scan_ids.size < max_size
+      next unless scan.scan_completed
+      if new_scan_time[scan.id] < Time.now
         scan_id = Scan.schedule scan.domain.url, scan.path
-        Log::info "scheduled #{scan_id}, #{scan.domain.url}#{scan.path} rescan (#{scan.ads.size} ads, last #{scan.updated_at})", "scheduler"
+        Log::info "scheduled #{scan_id}, #{scan.domain.url}#{scan.path} rescan (#{scan.ads.size} ads, last #{scan.updated_at}, next #{new_scan_time[scan.id]})", "scheduler"
         scan_ids << scan_id
       end
     end
@@ -110,7 +114,7 @@ module Scheduler
   def self.inject( scan_ids )
     scan_ids.each do |scan_id|
       AWS::SQS::push scan_id
-      Log::info "injected scan_id #{scan_id}", "scheduler"
+      Log::debug "injected scan_id #{scan_id}", "scheduler"
     end
   end
 
@@ -147,6 +151,13 @@ module Scheduler
     end
 
     exit if options.bail
+
+    if options.interval
+      Scheduler.send :remove_const, :INTERVAL
+      Scheduler.send :const_set, :INTERVAL, options.interval.to_i
+
+    end
+    Log::info "interval set to #{INTERVAL} seconds", "scheduler"
 
     Util::init_quantcast
 
