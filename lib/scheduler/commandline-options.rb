@@ -21,7 +21,7 @@ module Scheduler
         collected_options.sqs_queue = queue
       end
 
-      opts.on("--url URL", String, "optional. inject URL. use --url any number of times. each URL must be prefixed with transport protocol (i.e. http://)") do |url|
+      opts.on("--url URL", String, "optional. schedule a scan for URL. use --url any number of times. each URL must be prefixed with transport protocol (i.e. http://)") do |url|
         collected_options.urls.push url
       end
 
