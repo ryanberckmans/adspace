@@ -54,10 +54,7 @@ class Log
     @@loggers ||= {}
     if not @@loggers[ name ]
       filename = PATH + name + EXTENSION
-      file = File.open filename, File::WRONLY | File::APPEND | File::CREAT
-      raise "failed to open log file #{filename}" unless file
-      file.sync = true
-      @@loggers[name] = Logger.new file, ROTATION
+      @@loggers[name] = Logger.new filename, ROTATION
       raise "failed to initialize logger #{name}" unless @@loggers[name]
       @@loggers[name].level = params[:level] if params[:level]
       @@loggers[name].log Logger::INFO, "opening log file"
