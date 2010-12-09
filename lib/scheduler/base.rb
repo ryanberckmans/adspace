@@ -91,7 +91,7 @@ module Scheduler
         Log::debug "nil at #{search_mid}", "scheduler"
         search_max = search_mid - 1
       end
-      break if search_max - search_min < 4
+      break if search_max - search_min < 2
     end # this binary search algorithm bounds the number of database calls to find the next un-registered domain with lowest quantcast_rank
     Log::debug "new domain binary search terminated at #{search_min}", "scheduler"
     
