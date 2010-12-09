@@ -11,6 +11,7 @@ module Scheduler
     collected_options.size = false
     collected_options.clear = false
     collected_options.bail = false
+    collected_options.no_log = false
     collected_options.pwd = nil
 
     opts = OptionParser.new do |opts|
@@ -39,6 +40,10 @@ module Scheduler
       opts.on("-c", "--clear-queue", "optional. clear the queue and then exit") do
         collected_options.clear = true
         collected_options.bail = true
+      end
+
+      opts.on("-l", "--no-log", "optional. log to stdout") do
+        collected_options.no_log = true
       end
 
       opts.on("-b", "--bail", "optional. perform initial tasks but do not execute scheduler main loop") do

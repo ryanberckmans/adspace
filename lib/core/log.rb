@@ -46,21 +46,21 @@ class Log
     @@default.log sev, msg, progname
   end
   
-  def self.get( name = nil, params = {} )
-    if not name
+  def self.get( logdev = nil, params = {} )
+    if not logdev
       raise "tried to return the default logger, but the default logger has not yet been set" unless defined? @@default
       return @@default
     end
     @@loggers ||= {}
-    if not @@loggers[ name ]
-      filename = PATH + name + EXTENSION
-      @@loggers[name] = Logger.new filename, ROTATION
-      raise "failed to initialize logger #{name}" unless @@loggers[name]
-      @@loggers[name].level = params[:level] if params[:level]
-      @@loggers[name].log Logger::INFO, "opening log file"
+    if not @@loggers[ logdev ]
+      logdev = PATH + logdev + EXTENSION if logdev.is_a? String
+      @@loggers[logdev] = Logger.new logdev, ROTATION
+      raise "failed to initialize logger #{logdev.to_s}" unless @@loggers[logdev]
+      @@loggers[logdev].level = params[:level] if params[:level]
+      @@loggers[logdev].log Logger::INFO, "opening log file"
     end
-    @@default = @@loggers[ name ] if params[:default]
-    @@loggers[ name ]
+    @@default = @@loggers[ logdev ] if params[:default]
+    @@loggers[ logdev ]
   end
 
   def self.close_all

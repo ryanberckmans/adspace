@@ -5,7 +5,9 @@ $:.unshift File.expand_path(File.dirname(__FILE__) + "/../lib")
 require "adbot/base.rb"
 options = Adbot::parse_options( ARGV )
 Dir.chdir options.pwd if options.pwd
-Log::get "adbot", { :default => true, :level => Logger::DEBUG }
+logdev = "adbot"
+logdev = STDOUT if options.no_log
+Log::get logdev, { :default => true, :level => Logger::DEBUG }
 Log::info "initialized", "adbot"
 
 # persistence

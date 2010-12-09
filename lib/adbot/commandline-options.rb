@@ -13,6 +13,7 @@ module Adbot
       collected_options.selenium_host = "localhost"
       collected_options.selenium_port = 4444
       collected_options.sqs_queue = nil
+      collected_options.no_log = false
       collected_options.pwd = nil
       
       opts = OptionParser.new do |opts|
@@ -40,12 +41,16 @@ module Adbot
           collected_options.selenium_port = port
         end
 
+        opts.on("-l", "--no-log", "optional. log to stdout") do
+          collected_options.no_log = true
+        end
+
         opts.on("-b", "--bail", "optional. read commandline options but exit instead of running adbot") do
           collected_options.bail = true
         end
 
         opts.on("--pwd PWD", "optional. set the present working directory to pwd") do |pwd|
-        collected_options.pwd = pwd
+          collected_options.pwd = pwd
         end
         
         opts.on_tail("-h", "--help", "show this message") do
