@@ -7,12 +7,12 @@ module Scheduler
   INTERVAL = 60 * 1
   DESIRED_INTERVALS = 10
   NEW_RATE_RATIO = 0.35
-  MINIMUM_QUEUE_SIZE = 12
+  MINIMUM_QUEUE_SIZE = 25
   HOUR = 60 * 60
   DAY = HOUR * 24
   WEEK = DAY * 7
   RESCAN_NO_ADS = WEEK
-  RESCAN_HAS_ADS = DAY * 2
+  RESCAN_HAS_ADS = DAY * 3
   RESCAN_FAIL = WEEK
 
   def self.consumption_tracker( coroutine )
@@ -155,7 +155,6 @@ module Scheduler
     if options.interval
       Scheduler.send :remove_const, :INTERVAL
       Scheduler.send :const_set, :INTERVAL, options.interval.to_i
-
     end
     Log::info "interval set to #{INTERVAL} seconds", "scheduler"
 
@@ -171,12 +170,22 @@ module Scheduler
 
       scan_ids = []
       Log::info "queue requires additional #{max_size}", "scheduler"
+      Log::debug "entering main loop", "scheduler"
       while scan_ids.size < max_size
+        Log::debug "entering inflight", "scheduler"
         inflight scan_ids, max_size
+        Log::debug "exiting inflight", "scheduler"
+        Log::debug "entering never_scanned", "scheduler"
         never_scanned scan_ids, max_size
+        Log::debug "exiting never_scanned", "scheduler"
+        Log::debug "entering rescan", "scheduler"
         rescan scan_ids, max_size
+        Log::debug "exiting rescan", "scheduler"
+        Log::debug "entering new_domains", "scheduler"
         new_domains max_size - scan_ids.size
+        Log::debug "exiting new_domains", "scheduler"
       end
+      Log::debug "exiting main loop", "scheduler"
       inject scan_ids
       Log::info "#{scan_ids.size} (max #{max_size}) added to the queue", "scheduler"
     end
