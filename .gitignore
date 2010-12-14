@@ -1,6 +1,6 @@
 db/*
 database.yml
 sqs.yml
-adchart.org
 lib/closure-library
 *~
+log/*.log

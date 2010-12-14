@@ -14,23 +14,24 @@ module Adbot
         (ad.target_location = "not-following-ads" and next) unless options.follow_ads
         begin
           (ad.target_location = "no-link-url" and next) unless ad.link_url and ad.link_url.length > 0
-          (ad.target_location = "link-url-points-to-same-domain" and next) if Util::domain_contains_url domain, ad.link_url
+          # websites route adverts through their own domain, to valid target_urls. can't just flag them all as no-follow.
+          #(ad.target_location = "link-url-points-to-same-domain" and next) if Util::domain_contains_url domain, ad.link_url
           (ad.target_location = "link-url-was-google-adsense" and next) if Util::domain_contains_url "http://google.com", ad.link_url
           (ad.target_location = "link-url-was-google-page-of-ads" and next) if ad.link_url =~ /doubleclick\.net\/pagead\/ads/i
           (ad.target_location = "link-url-is-javascript" and next) if ad.link_url =~ /^javascript/i
           (ad.target_location = "failed-link-url" and next) if ad.link_url =~ /^failed/i
           if resolved_link_urls[ad.link_url]
             ad.target_location = resolved_link_urls[ad.link_url]
-            puts "link url (#{ad.link_url}) resolved by cache to location::: #{ad.target_location}"
+            Log::info "link url (#{ad.link_url}) resolved by cache to location::: #{ad.target_location}"
             next
           end
           ad.target_location = SeleniumInterface::get_link_target_location( browser, ad.link_url )
           resolved_link_urls[ad.link_url] = ad.target_location
         rescue Exception => e
           ad.target_location = "error-getting-target-location"
-          puts e.backtrace
-          puts e.message
-          puts "error getting ad target location (#{e.class}, #{e.class.ancestors.join ","}), continuing scan"
+          Log::warn e.backtrace.join "\t"
+          Log::warn e.message
+          Log::warn "error getting ad target location (#{e.class}, #{e.class.ancestors.join ","}), continuing scan"
         end
       end
     end
@@ -40,13 +41,13 @@ module Adbot
       begin
         scan = Scan.find scan_id
       rescue StandardError => e
-        puts e.backtrace
-        puts e.message
+        Log::error e.backtrace.join "\t"
+        Log::error "#{e.class} " + e.message
         return nil
       end
 
       if not scan.domain or not scan.domain.url
-        puts "scan #{scan_id} had no associated domain"
+        Log::error "scan #{scan_id} had no associated domain", "adbot"
         return nil
       end
       
@@ -61,7 +62,7 @@ module Adbot
 
       Util::quantcast_rank url_result
 
-      puts "scanning #{url_result.domain + url_result.path} scan_id #{scan_id}"
+      Log::info "scanning #{url_result.domain + url_result.path} scan_id #{scan_id}", "adbot"
       
       begin
         browser = SeleniumInterface::browser( url_result.domain, options.selenium_host, options.selenium_port )
@@ -87,34 +88,29 @@ module Adbot
         url_result.title = SeleniumInterface::page_title browser
 
         url_result.screenshot = SeleniumInterface::page_screenshot browser
-        #File.open("/tmp/#{url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue puts "failed to save screenshot"
+        #File.open("/tmp/#{url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue Log::info "failed to save screenshot"
         
         follow_ad_link_urls( url_result.ads, browser, url_result.domain, options )
 
         url_result.html = nil
         url_result.screenshot = nil
-        if options.verbose
-          puts "final struct:"
-          puts url_result
-          url_result.ads.each { |ad|
-            puts ad.target_location
-          }
-        end
+        Log::debug "final struct:"
+        Log::debug url_result
 
       rescue Errno::ECONNREFUSED => e
-        puts "connection to selenium server failed"
+        Log::fatal "connection to selenium server failed", "adbot"
         raise
       rescue Timeout::Error, StandardError => e
         # Timeout::Error, raised if an http connection times out, derives from Interrupt, which is also the exception for SIGnals.
         # catch Timeout::Error, but re-raise Interrupt so that SIGnals work correctly.
-        puts e.backtrace
-        puts e.message
+        Log::error e.backtrace.join "\t"
+        Log::error "#{e.class} " + e.message
         url_result.exception = e
       rescue Interrupt, SystemExit => e
-        puts "scan.rb: re-raising caught exception: #{e.class} (#{e.class.ancestors.join ","})"
+        Log::fatal "scan.rb: re-raising caught exception: #{e.class} (#{e.class.ancestors.join ","})"
         raise
       rescue Exception => e
-        puts "scan.rb: re-raising unknown exception: #{e.class} (#{e.class.ancestors.join ","})"
+        Log::fatal "scan.rb: re-raising unknown exception: #{e.class} (#{e.class.ancestors.join ","})"
         raise
       ensure
         SeleniumInterface::end_session browser

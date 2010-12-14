@@ -12,11 +12,19 @@ require 'adabase/app/models/scan_fail.rb'
 require 'adabase/app/models/ad.rb'
 
 require "scheduler/base.rb"
-
 options = Scheduler::parse_options ARGV
-
 Dir.chdir options.pwd if options.pwd
+logdev = "scheduler"
+logdev = STDOUT if options.no_log
+Log::get logdev, { :default => true, :level => Logger::DEBUG }
+Log::info "initialized", "scheduler"
 
 ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
 
-Scheduler::run options
+begin
+  Scheduler::run options
+rescue Exception => e
+  Log::fatal "uncaught exception #{e.class}", "scheduler"
+  Log::fatal e.backtrace.join "\t"
+  Log::fatal e.message if e.message.length > 0 
+end

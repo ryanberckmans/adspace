@@ -2,4 +2,4 @@
 
 ./schedulerd start -- --pwd `pwd`
 ./seleniumd start
-./adbotd start -- --pwd `pwd` -v
+./adbotd start -- --pwd `pwd`
