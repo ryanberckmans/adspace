@@ -179,7 +179,7 @@ module Scheduler
         never_scanned scan_ids, max_size
         Log::debug "exiting never_scanned", "scheduler"
         Log::debug "entering rescan", "scheduler"
-        rescan scan_ids, max_size
+        #rescan scan_ids, max_size
         Log::debug "exiting rescan", "scheduler"
         Log::debug "entering new_domains", "scheduler"
         new_domains max_size - scan_ids.size
