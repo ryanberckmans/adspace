@@ -4,4 +4,4 @@ require 'rubygems'
 require 'bundler/setup'
 require 'daemons'
 
-Daemons.run 'adbot', { :multiple => true, :monitor => true }
+Daemons.run 'adbot', { :multiple => true }
