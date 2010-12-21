@@ -12,7 +12,7 @@ pwd = Dir.pwd
 
 logfile = Log::PATH + "selenium" + Log::EXTENSION
 
-Daemons.run_proc( 'selenium-server', { :multiple => false }) do
+Daemons.run_proc( 'selenium-server', { :multiple => false, :monitor => true }) do
   Dir.chdir pwd
   at_exit { system "ps -eF | grep java | grep 'selenium-server' | grep -v 'grep' | sed 's/^[^[:digit:]]*\\([[:digit:]]*\\).*/\\1/' | xargs kill " }
   system "./selenium >> #{logfile}"
