@@ -5,6 +5,7 @@ gem 'right_aws'
 gem 'activerecord'
 
 gem 'daemons'
+gem 'mysql2'
 
 group :test do
   gem 'ruby-debug'
