@@ -22,9 +22,9 @@ logdev = STDOUT if options.no_log
 Log::get logdev, { :default => true, :level => Logger::DEBUG }
 Log::info "initialized", "scheduler"
 
-ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
-
 begin
+  ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
+
   Scheduler::run options
 rescue Exception => e
   Log::fatal "uncaught exception #{e.class}", "scheduler"
