@@ -92,7 +92,6 @@ module Adbot
         
         follow_ad_link_urls( url_result.ads, browser, url_result.domain, options )
 
-        url_result.html = nil
         url_result.screenshot = nil
         Log::debug "final struct:"
         Log::debug url_result
