@@ -3,14 +3,7 @@
 $:.unshift File.expand_path(File.dirname(__FILE__) + "/../lib")
 
 require 'rubygems'
-require 'active_record'
-require 'yaml'
-
-require 'adabase/app/models/domain.rb'
-require 'adabase/app/models/scan.rb'
-require 'adabase/app/models/scan_fail.rb'
-require 'adabase/app/models/ad.rb'
-
+require 'bundler/setup'
 require "scheduler/base.rb"
 options = Scheduler::parse_options ARGV
 Dir.chdir options.pwd if options.pwd
@@ -19,9 +12,17 @@ logdev = STDOUT if options.no_log
 Log::get logdev, { :default => true, :level => Logger::DEBUG }
 Log::info "initialized", "scheduler"
 
-ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
-
 begin
+  require 'active_record'
+  require 'yaml'
+
+  require 'adabase/app/models/domain.rb'
+  require 'adabase/app/models/scan.rb'
+  require 'adabase/app/models/scan_fail.rb'
+  require 'adabase/app/models/ad.rb'
+
+  ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
+
   Scheduler::run options
 rescue Exception => e
   Log::fatal "uncaught exception #{e.class}", "scheduler"
