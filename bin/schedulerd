@@ -4,4 +4,4 @@ require 'rubygems'
 require 'bundler/setup'
 require 'daemons'
 
-Daemons.run 'scheduler', { :multiple => false, :monitor => true }
+Daemons.run 'scheduler', { :multiple => false }
