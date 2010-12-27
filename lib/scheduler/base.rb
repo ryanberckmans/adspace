@@ -18,14 +18,16 @@ module Scheduler
   def self.consumption_tracker( coroutine )
     previous_size = 0
     consumption_rate = 0.0
+    increase_queue_by = 0
     while true
-      previous_size = AWS::SQS::size rescue previous_size
+      previous_size = AWS::SQS::size + increase_queue_by rescue previous_size # adding increase_queue_by because AWS::SQS::size doesn't include recently added items
       coroutine.yield
       size = AWS::SQS::size rescue previous_size
       consumption_rate = consumption_rate * NEW_RATE_RATIO + (previous_size - size) * (1 - NEW_RATE_RATIO)
-      Log::info "consumption_rate: #{consumption_rate}, queue size: #{size}", "scheduler"
-      increase_queue_by = DESIRED_INTERVALS * [consumption_rate,0.0].max - size
-      coroutine.yield [increase_queue_by.to_i,0,MINIMUM_QUEUE_SIZE - size].max
+      Log::info "consumption_rate: #{consumption_rate}, previous queue: #{previous_size}, queue: #{size}", "scheduler"
+      rate_increase = (DESIRED_INTERVALS * [consumption_rate,0.0].max - size).to_i
+      increase_queue_by = [rate_increase,0,MINIMUM_QUEUE_SIZE - size].max
+      coroutine.yield increase_queue_by
     end
   end
 
