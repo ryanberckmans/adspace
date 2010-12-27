@@ -5,7 +5,7 @@ require Util.here "commandline-options.rb"
 
 module Scheduler
   INTERVAL = 60 * 1
-  DESIRED_INTERVALS = 10
+  DESIRED_INTERVALS = 3
   NEW_RATE_RATIO = 0.35
   MINIMUM_QUEUE_SIZE = 25
   HOUR = 60 * 60
