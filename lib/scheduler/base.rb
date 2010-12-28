@@ -34,7 +34,7 @@ module Scheduler
 
   def self.never_scanned( scan_ids, max_size )
     return unless scan_ids.size < max_size
-    domains = (Domain.find :all).select { |d| d.scans.size < 1 }
+    domains = Domain.find :all, :conditions => ["scans.id IS NULL"], :joins => ["left join scans on domains.id = scans.domain_id"]
     domains.each do |domain|
       break unless scan_ids.size < max_size
       scan_id = Scan.schedule domain.url, "/"
