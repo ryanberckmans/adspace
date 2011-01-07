@@ -5,7 +5,7 @@ require Util.here "commandline-options.rb"
 
 module Scheduler
   INTERVAL = 60 * 1
-  DESIRED_INTERVALS = 10
+  DESIRED_INTERVALS = 3
   NEW_RATE_RATIO = 0.35
   MINIMUM_QUEUE_SIZE = 25
   HOUR = 60 * 60
@@ -16,22 +16,25 @@ module Scheduler
   RESCAN_FAIL = WEEK
 
   def self.consumption_tracker( coroutine )
+    size = 0
     previous_size = 0
     consumption_rate = 0.0
+    increase_queue_by = 0
     while true
-      previous_size = AWS::SQS::size rescue previous_size
+      previous_size = size + increase_queue_by
       coroutine.yield
       size = AWS::SQS::size rescue previous_size
       consumption_rate = consumption_rate * NEW_RATE_RATIO + (previous_size - size) * (1 - NEW_RATE_RATIO)
-      Log::info "consumption_rate: #{consumption_rate}, queue size: #{size}", "scheduler"
-      increase_queue_by = DESIRED_INTERVALS * [consumption_rate,0.0].max - size
-      coroutine.yield [increase_queue_by.to_i,0,MINIMUM_QUEUE_SIZE - size].max
+      rate_increase = (DESIRED_INTERVALS * [consumption_rate,0.0].max - size).to_i
+      increase_queue_by = [rate_increase,0,MINIMUM_QUEUE_SIZE - size].max
+      Log::info "consumption rate: #{consumption_rate}, previous queue: #{previous_size}, queue: #{size}, increase by: #{increase_queue_by}", "scheduler"
+      coroutine.yield increase_queue_by
     end
   end
 
   def self.never_scanned( scan_ids, max_size )
     return unless scan_ids.size < max_size
-    domains = (Domain.find :all).select { |d| d.scans.size < 1 }
+    domains = Domain.find :all, :conditions => ["scans.id IS NULL"], :joins => ["left join scans on domains.id = scans.domain_id"]
     domains.each do |domain|
       break unless scan_ids.size < max_size
       scan_id = Scan.schedule domain.url, "/"
@@ -164,26 +167,25 @@ module Scheduler
     
     while true
       consumption.resume
-      Log::info "sleeping", "scheduler"
+      Log::info "sleeping (#{INTERVAL})", "scheduler"
       sleep INTERVAL
       max_size = consumption.resume
 
       scan_ids = []
-      Log::info "queue requires additional #{max_size}", "scheduler"
       Log::debug "entering main loop", "scheduler"
       while scan_ids.size < max_size
         Log::debug "entering inflight", "scheduler"
         inflight scan_ids, max_size
-        Log::debug "exiting inflight", "scheduler"
+        Log::debug "exiting inflight (#{scan_ids.size} of #{max_size} scans allocated)", "scheduler"
         Log::debug "entering never_scanned", "scheduler"
         never_scanned scan_ids, max_size
-        Log::debug "exiting never_scanned", "scheduler"
+        Log::debug "exiting never_scanned (#{scan_ids.size} of #{max_size} scans allocated)", "scheduler"
         Log::debug "entering rescan", "scheduler"
         rescan scan_ids, max_size
-        Log::debug "exiting rescan", "scheduler"
+        Log::debug "exiting rescan (#{scan_ids.size} of #{max_size} scans allocated)", "scheduler"
         Log::debug "entering new_domains", "scheduler"
         new_domains max_size - scan_ids.size
-        Log::debug "exiting new_domains", "scheduler"
+        Log::debug "exiting new_domains (#{scan_ids.size} of #{max_size} scans allocated)", "scheduler"
       end
       Log::debug "exiting main loop", "scheduler"
       inject scan_ids
