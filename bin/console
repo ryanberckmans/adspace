@@ -9,6 +9,7 @@ require "adbot/base.rb"
 options = Adbot::parse_options( ARGV )
 Dir.chdir options.pwd if options.pwd
 logdev = STDOUT
+logdev = File.open "/dev/null", "a" if options.no_log
 Log::get logdev, { :default => true, :level => Logger::DEBUG }
 Log::info "initialized", "adbot"
 
