@@ -32,7 +32,7 @@ module Adbot
 
     def output_tabular_headers( file_path )
       begin
-        headers = %w[ scan_time scan_id scan_created_at scan_updated_at scan_completed? domain path quantcast_rank page_width page_height page_title scan_failed? fail_message fail_backtrace ads_found? ad_id ad_link_url ad_target_url ad_screenshot_width ad_screenshot_height ad_format ]
+        headers = %w[ scan_time scan_unix_time scan_id scan_created_at scan_updated_at scan_completed? domain path quantcast_rank page_width page_height page_title scan_failed? fail_message fail_backtrace ads_found? ad_id ad_link_url ad_target_url ad_screenshot_width ad_screenshot_height ad_format ]
         tab = "\t"
         to_write = ""
         headers.each do |header| to_write += header + tab end
@@ -56,6 +56,7 @@ module Adbot
         tab = "\t"
         endl = "\n"
         prefix =
+          scan.scan_time.to_s + tab +
           scan.scan_time.to_f.to_s + tab +
           scan.id.to_s + tab +
           scan.created_at.to_f.to_s + tab +
