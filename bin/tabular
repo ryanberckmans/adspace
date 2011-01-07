@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.expand_path(File.dirname(__FILE__) + "/../lib")
+
+require 'rubygems'
+require 'bundler/setup'
+require "adbot/base.rb"
+options = Adbot::parse_options( ARGV )
+Dir.chdir options.pwd if options.pwd
+logdev = STDOUT
+logdev = File.open "/dev/null", "a" if options.no_log
+Log::get logdev, { :default => true, :level => Logger::DEBUG }
+
+begin
+  require 'active_record'
+  require 'right_aws'
+  require 'yaml'
+
+  require 'adabase/app/models/scan_fail.rb'
+  require 'adabase/app/models/domain.rb'
+  require 'adabase/app/models/scan.rb'
+  require 'adabase/app/models/ad.rb'
+  require 'adabase/app/models/screenshot.rb'
+  require 'adabase/app/models/ad_image.rb'
+
+  s3 = RightAws::S3.new(File.read('../aws/access-key').strip,
+                        File.read('../aws/secret-access-key').strip,
+                        { :logger => Log::get } )
+
+  Screenshot.bucket = RightAws::S3::Bucket.new(s3, 'adchart_screenshots')
+
+  ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
+
+  total = Scan.count
+  limit = 1000
+  offset = 0
+  while offset < total
+    scans = Scan.find :all, :offset => offset, :limit => limit, :conditions => ["scan_completed = ?", true], :include => [ :ads, :domain, :scan_fail]
+    scans.each do |s| Adbot::output_tabular s, options end
+    puts "%3.2f%" % [100 * (offset.to_f + limit) / total,100.0].min
+    offset += limit
+  end
+  puts "done"
+rescue Exception => e
+  Log::fatal "uncaught exception #{e.class}", "adbot"
+  Log::fatal e.backtrace.join "\t"
+  Log::fatal e.message if e.message.length > 0 
+end
