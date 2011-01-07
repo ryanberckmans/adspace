@@ -87,7 +87,7 @@ module Adbot
         url_result.page_height = SeleniumInterface::page_height browser
         url_result.title = SeleniumInterface::page_title browser
 
-        url_result.screenshot = SeleniumInterface::page_screenshot browser
+        #url_result.screenshot = SeleniumInterface::page_screenshot browser
         #File.open("/tmp/#{url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue Log::info "failed to save screenshot"
         
         follow_ad_link_urls( url_result.ads, browser, url_result.domain, options )
