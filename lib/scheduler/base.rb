@@ -6,7 +6,7 @@ require Util.here "commandline-options.rb"
 module Scheduler
   INTERVAL = 60 * 1
   DESIRED_INTERVALS = 3
-  NEW_RATE_RATIO = 0.35
+  NEW_RATE_RATIO = 0.5
   MINIMUM_QUEUE_SIZE = 25
   HOUR = 60 * 60
   DAY = HOUR * 24
@@ -16,20 +16,21 @@ module Scheduler
   RESCAN_FAIL = WEEK
 
   def self.consumption_tracker( coroutine )
-    size = 0
+    size = AWS::SQS::size rescue 0
+    Log::info "initial queue size #{size}", "scheduler"
     previous_size = 0
-    consumption_rate = 0.0
+    consumption_rate_per_minute = 0.0
     increase_queue_by = 0
     time_previous = Time.now
     while true
       previous_size = size + increase_queue_by
       coroutine.yield
       size = AWS::SQS::size rescue previous_size
-      consumption_rate = consumption_rate * NEW_RATE_RATIO + (previous_size - size) * (1 - NEW_RATE_RATIO)
-      rate_increase = (DESIRED_INTERVALS * [consumption_rate,0.0].max - size).to_i
-      increase_queue_by = [rate_increase,0,MINIMUM_QUEUE_SIZE - size].max
       time_now = Time.now
-      consumption_rate_per_minute = (consumption_rate / ((time_now - time_previous) / 60.0 ))
+      elapsed_minutes = (time_now - time_previous) / 60.0
+      consumption_rate_per_minute = consumption_rate_per_minute * NEW_RATE_RATIO + ( (previous_size - size) / elapsed_minutes ) * (1 - NEW_RATE_RATIO)
+      rate_increase = (DESIRED_INTERVALS * [consumption_rate_per_minute,0.0].max - size).to_i
+      increase_queue_by = [rate_increase,0,MINIMUM_QUEUE_SIZE - size].max
       Log::info "consumption per minute: #{"%.2f" % consumption_rate_per_minute}, time elapsed: #{"%.2f" % (time_now - time_previous)}s, previous queue: #{previous_size}, queue: #{size}, increase by: #{increase_queue_by}", "scheduler"
       time_previous = time_now
       coroutine.yield increase_queue_by

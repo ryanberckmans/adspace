@@ -14,7 +14,7 @@ module AWS
     #   it is our responsibility to handle redundant/duplicate messages
 
     QUEUE_NAME = $SQS_QUEUE || "scan-queue"
-    QUEUE_VISIBILITY = 180 # seconds
+    QUEUE_VISIBILITY = 600 # seconds
 
     class << self
 
