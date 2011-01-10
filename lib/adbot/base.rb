@@ -8,7 +8,7 @@ require Util.here "database.rb"
 module Adbot
 
   BASE_POLL_FREQUENCY = 2 # seconds
-  MAX_BACKOFF = 4 # adbot will not sleep longer than BASE_POLL_FREQUENCY * 2**MAX_BACKOFF
+  MAX_BACKOFF = 2 # adbot will not sleep longer than BASE_POLL_FREQUENCY * 2**MAX_BACKOFF
   
   class << self
 
