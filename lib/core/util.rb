@@ -11,6 +11,9 @@ module Util
     File.expand_path(File.join(File.dirname(caller[0].split(":")[0]), string))
   end
 
+  def self.strip_newlines( string )
+    string.gsub /\r?\n/, ", "
+  end
 
   def self.init_quantcast
     $quantcast_ranks = {}

@@ -45,7 +45,7 @@ module Scheduler
 
   def self.inflight( scan_ids, max_size )
     return unless scan_ids.size < max_size
-    uncompleted = Scan.find :all, :conditions => [ "scan_completed = ? and updated_at < ?", false, Time.now - HOUR * 6  ]
+    uncompleted = Scan.find :all, :limit => max_size - scan_ids.size, :conditions => [ "scan_completed = ? and updated_at < ?", false, Time.now - HOUR * 6  ]
     uncompleted.each do |scan|
       break unless scan_ids.size < max_size
       scan.touch

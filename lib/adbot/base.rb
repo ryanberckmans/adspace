@@ -68,7 +68,7 @@ module Adbot
           Adbot::save url_result, scan_id.to_s if url_result # not ::save clobbers the url_result struct
         rescue Exception => e
           Log::error e.backtrace.join "\t"
-          Log::error e.message
+          Log::error Util::strip_newlines e.message
           Log::error "#{e.class} failed to save scan #{scan_id.to_s} to db", "adbot"
         end
 

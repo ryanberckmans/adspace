@@ -28,7 +28,7 @@ module SeleniumInterface
         browser.close_current_browser_session if browser
       rescue Exception => e
         Log::error e.backtrace.join "\t"
-        Log::error "#{e.class} " + e.message
+        Log::error "#{e.class} #{Util::strip_newlines e.message}"
         Log::error "error ending browser session"
       end
     end
@@ -56,7 +56,7 @@ module SeleniumInterface
         yield
       rescue Selenium::CommandError => e
         if e.message =~ /Timed out after/
-          Log::warn "#{e.class} " + e.message
+          Log::warn "#{e.class} #{Util::strip_newlines e.message}"
           Log::warn "selenium timed out, attempting to continue operation"
         else
           raise

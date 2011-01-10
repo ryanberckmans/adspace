@@ -30,7 +30,7 @@ module Adbot
         rescue Exception => e
           ad.target_location = "error-getting-target-location"
           Log::warn e.backtrace.join "\t"
-          Log::warn e.message
+          Log::warn "#{e.class} #{Util::strip_newlines e.message}"
           Log::warn "error getting ad target location (#{e.class}, #{e.class.ancestors.join ","}), continuing scan"
         end
       end
@@ -42,7 +42,7 @@ module Adbot
         scan = Scan.find scan_id
       rescue StandardError => e
         Log::error e.backtrace.join "\t"
-        Log::error "#{e.class} " + e.message
+        Log::error "#{e.class} #{Util::strip_newlines e.message}"
         return nil
       end
 
@@ -104,7 +104,7 @@ module Adbot
         # Timeout::Error, raised if an http connection times out, derives from Interrupt, which is also the exception for SIGnals.
         # catch Timeout::Error, but re-raise Interrupt so that SIGnals work correctly.
         Log::error e.backtrace.join "\t"
-        Log::error "#{e.class} " + e.message
+        Log::error "#{e.class} #{Util::strip_newlines e.message}"
         url_result.exception = e
       rescue Interrupt, SystemExit => e
         Log::fatal "scan.rb: re-raising caught exception: #{e.class} (#{e.class.ancestors.join ","})"

@@ -22,7 +22,7 @@ module AWS
         @@sqs = RightAws::SqsGen2.new( AWS::access_key, AWS::secret_access_key, { :logger => Log::get } )
       rescue Exception => e
         Log::error e.backtrace.join "\t"
-        Log::error "#{e.class} " + e.message
+        Log::error "#{e.class} #{Util::strip_newlines e.message}"
         Log::error "error creating sqs connection"
         raise
       end
@@ -31,7 +31,7 @@ module AWS
         @@queue = @@sqs.queue(QUEUE_NAME, true, QUEUE_VISIBILITY)
       rescue Exception => e
         Log::error e.backtrace.join "\t"
-        Log::error "#{e.class} " + e.message
+        Log::error "#{e.class} #{Util::strip_newlines e.message}"
         Log::error "error creating/retrieving queue"
         raise
       end
@@ -45,7 +45,7 @@ module AWS
           @@queue.push message
         rescue Exception =>e
           Log::error e.backtrace.join "\t"
-          Log::error "#{e.class} " + e.message
+          Log::error "#{e.class} #{Util::strip_newlines e.message}"
           raise
         end
       end
@@ -55,7 +55,7 @@ module AWS
           @@queue.receive
         rescue Exception => e
           Log::error e.backtrace.join "\t"
-          Log::error "#{e.class} " + e.message
+          Log::error "#{e.class} #{Util::strip_newlines e.message}"
           nil
         end
       end
@@ -65,7 +65,7 @@ module AWS
           message.delete
         rescue Exception => e
           Log::error e.backtrace.join "\t"
-          Log::error "#{e.class} " + e.message
+          Log::error "#{e.class} #{Util::strip_newlines e.message}"
         end
       end
 
