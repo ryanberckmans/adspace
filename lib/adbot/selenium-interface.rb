@@ -77,6 +77,7 @@ module SeleniumInterface
     end
 
     def highlight_ads( browser )
+      Log::debug "highlighting ads", "selenium"
       on browser, "adbot.highlight_ads()"
     end
 
@@ -104,20 +105,29 @@ module SeleniumInterface
     end
 
     def include_browser_util( browser )
+      Log::debug "injecting jquery", "selenium"
       browser.run_script( JQUERY_SCRIPT )
+      Log::debug "done injecting jquery", "selenium"
+      Log::debug "injecting adbot jquery", "selenium"
       browser.run_script( ADBOT_JQUERY_SCRIPT )
+      Log::debug "done injecting adbot jquery", "selenium"
+      Log::debug "injecting browser util", "selenium"
       browser.run_script( BROWSER_UTIL_SCRIPT )
+      Log::debug "done injecting browser util", "selenium"
     end
 
     def page_width( browser )
+      Log::debug "get page_width", "selenium"
       (on browser, "adbot.page_width").to_f
     end
 
     def page_height( browser )
+      Log::debug "get page_height", "selenium"
       (on browser, "adbot.page_height").to_f
     end
 
     def page_title( browser )
+      Log::debug "get title", "selenium"
       browser.title
     end
 
@@ -128,6 +138,7 @@ module SeleniumInterface
     end
 
     def get_ads_in_current_frame( browser )
+      Log::debug "entering get_ads_in_current_frame", "selenium"
       on browser, "ADBOTjQuery( this.browserbot.getUserWindow().adbot.process_ads )"
       
       ads = []
@@ -165,20 +176,23 @@ module SeleniumInterface
 
       on browser, "adbot.highlight_ads()"
       
+      Log::debug "exiting get_ads_in_current_frame", "selenium"
       ads
     end
 
     def get_ads( browser )
+      Log::debug "entering get_ads", "selenium"
       ads = get_ads_in_current_frame browser
       (get_ad_frames browser).each do |frame|
-        Log::debug "entering frame #{frame}"
+        Log::debug "entering frame #{frame}", "selenium"
         browser.select_frame frame
         include_browser_util browser
         on browser, "ADBOTjQuery('a,iframe,object,embed').addClass(this.browserbot.getUserWindow().adbot.ad_class)"
         ads.concat(get_ads browser)
         browser.select_frame "relative=up"
-        Log::debug "exited frame #{frame}"
+        Log::debug "exited frame #{frame}", "selenium"
       end
+      Log::debug "exiting get_ads", "selenium"
       ads
     end
 

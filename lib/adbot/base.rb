@@ -39,6 +39,7 @@ module Adbot
       loop do
         begin
           scan_id = AWS::SQS::next
+          Log::debug "received next scan #{scan_id.to_s} from sqs", "adbot"
         rescue Interrupt, SystemExit
           raise
         rescue Exception => e
@@ -56,23 +57,31 @@ module Adbot
 
         url_result = Adbot::scan_url scan_id.to_s, options
 
-        if not url_result
-          Log::info "scan failed scan_id #{scan_id.to_s}", "adbot"
-        elsif url_result.exception
-          Log::info "scan failed for #{url_result.domain + url_result.path} scan_id #{scan_id.to_s}", "adbot"
-        else
-          Log::info "scan succeeded for #{url_result.domain + url_result.path} scan_id #{scan_id.to_s}", "adbot"
-        end
-
+        # save clobbers url_result, cache attribs for final log messages
+        domain = url_result.domain rescue nil
+        path = url_result.path rescue nil
+        exception = url_result.exception rescue nil
+        
         begin
+          Log::debug "saving url_result", "adbot"
           Adbot::save url_result, scan_id.to_s if url_result # not ::save clobbers the url_result struct
+          Log::debug "done saving url_result", "adbot"
         rescue Exception => e
           Log::error e.backtrace.join "\t"
           Log::error Util::strip_newlines e.message
           Log::error "#{e.class} failed to save scan #{scan_id.to_s} to db", "adbot"
         end
 
+        Log::debug "marking scan #{scan_id.to_s} in sqs as done", "adbot"
         AWS::SQS::done_with_next scan_id
+
+        if not url_result
+          Log::info "scan failed scan_id #{scan_id.to_s}", "adbot"
+        elsif exception
+          Log::info "scan failed for #{domain + path} scan_id #{scan_id.to_s}", "adbot"
+        else
+          Log::info "scan succeeded for #{domain + path} scan_id #{scan_id.to_s}", "adbot"
+        end
       end # loop do
     end # def run
   end # class << self
