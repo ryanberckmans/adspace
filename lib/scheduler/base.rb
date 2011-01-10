@@ -6,7 +6,7 @@ require Util.here "commandline-options.rb"
 module Scheduler
   INTERVAL = 60 * 1
   DESIRED_INTERVALS = 3
-  NEW_RATE_RATIO = 0.35
+  NEW_RATE_RATIO = 0.5
   MINIMUM_QUEUE_SIZE = 25
   HOUR = 60 * 60
   DAY = HOUR * 24
@@ -16,7 +16,8 @@ module Scheduler
   RESCAN_FAIL = WEEK
 
   def self.consumption_tracker( coroutine )
-    size = 0
+    size = AWS::SQS::size rescue 0
+    Log::info "initial queue size #{size}", "scheduler"
     previous_size = 0
     consumption_rate_per_minute = 0.0
     increase_queue_by = 0
