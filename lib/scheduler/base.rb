@@ -20,6 +20,7 @@ module Scheduler
     previous_size = 0
     consumption_rate = 0.0
     increase_queue_by = 0
+    time_previous = Time.now
     while true
       previous_size = size + increase_queue_by
       coroutine.yield
@@ -27,7 +28,10 @@ module Scheduler
       consumption_rate = consumption_rate * NEW_RATE_RATIO + (previous_size - size) * (1 - NEW_RATE_RATIO)
       rate_increase = (DESIRED_INTERVALS * [consumption_rate,0.0].max - size).to_i
       increase_queue_by = [rate_increase,0,MINIMUM_QUEUE_SIZE - size].max
-      Log::info "consumption rate: #{consumption_rate}, previous queue: #{previous_size}, queue: #{size}, increase by: #{increase_queue_by}", "scheduler"
+      time_now = Time.now
+      consumption_rate_per_minute = (consumption_rate / ((time_now - time_previous) / 60.0 ))
+      Log::info "consumption per minute: #{"%.2f" % consumption_rate_per_minute}, time elapsed: #{"%.2f" % (time_now - time_previous)}s, previous queue: #{previous_size}, queue: #{size}, increase by: #{increase_queue_by}", "scheduler"
+      time_previous = time_now
       coroutine.yield increase_queue_by
     end
   end
