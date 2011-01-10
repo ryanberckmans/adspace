@@ -5,7 +5,7 @@ require Util.here "commandline-options.rb"
 
 module Scheduler
   INTERVAL = 60 * 1
-  DESIRED_INTERVALS = 3
+  DESIRED_MINUTES = 15
   NEW_RATE_RATIO = 0.5
   MINIMUM_QUEUE_SIZE = 25
   HOUR = 60 * 60
@@ -29,7 +29,7 @@ module Scheduler
       time_now = Time.now
       elapsed_minutes = (time_now - time_previous) / 60.0
       consumption_rate_per_minute = consumption_rate_per_minute * NEW_RATE_RATIO + ( (previous_size - size) / elapsed_minutes ) * (1 - NEW_RATE_RATIO)
-      rate_increase = (DESIRED_INTERVALS * [consumption_rate_per_minute,0.0].max - size).to_i
+      rate_increase = (DESIRED_MINUTES * [consumption_rate_per_minute,0.0].max - size).to_i
       increase_queue_by = [rate_increase,0,MINIMUM_QUEUE_SIZE - size].max
       Log::info "consumption per minute: #{"%.2f" % consumption_rate_per_minute}, time elapsed: #{"%.2f" % (time_now - time_previous)}s, previous queue: #{previous_size}, queue: #{size}, increase by: #{increase_queue_by}", "scheduler"
       time_previous = time_now
@@ -165,6 +165,7 @@ module Scheduler
       Scheduler.send :const_set, :INTERVAL, options.interval.to_i
     end
     Log::info "interval set to #{INTERVAL} seconds", "scheduler"
+    Log::info "desiring #{DESIRED_MINUTES} minutes of work", "scheduler"
 
     Util::init_quantcast
 
