@@ -23,7 +23,7 @@ module Adbot
         Log::info "wrote error details for #{url_result.url} to #{file_path}"
       rescue Exception => e
         Log::error e.backtrace.join "\t"
-        Log::error e.message
+        Log::error Util::strip_newlines e.message
         Log::error "#{e.class} failed to write error details to #{options.output_dir}.error for #{url_result.url}"
       ensure
         f.close rescue nil
@@ -42,7 +42,7 @@ module Adbot
         Log::info "wrote tabular headers to #{file_path}"
       rescue Exception => e
         Log::error e.backtrace.join "\t"
-        Log::error e.message
+        Log::error Util::strip_newlines e.message
         Log::error "#{e.class} failed to write to #{options.output_dir} for #{scan.url}"
       ensure
         f.close rescue nil
@@ -102,7 +102,7 @@ module Adbot
         Log::info "wrote results for scan #{scan.id} to #{file_path}"
       rescue Exception => e
         Log::error e.backtrace.join "\t"
-        Log::error e.message
+        Log::error Util::strip_newlines e.message
         Log::error "#{e.class} failed to write to #{options.output_dir} for scan #{scan.id}"
       ensure
         f.close rescue nil

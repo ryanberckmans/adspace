@@ -30,7 +30,7 @@ module Adbot
         rescue Exception => e
           ad.target_location = "error-getting-target-location"
           Log::warn e.backtrace.join "\t"
-          Log::warn e.message
+          Log::warn "#{e.class} #{Util::strip_newlines e.message}"
           Log::warn "error getting ad target location (#{e.class}, #{e.class.ancestors.join ","}), continuing scan"
         end
       end
@@ -39,10 +39,11 @@ module Adbot
     public
     def scan_url( scan_id, options )
       begin
+        Log::debug "retrieving scan record from database", "adbot"
         scan = Scan.find scan_id
       rescue StandardError => e
         Log::error e.backtrace.join "\t"
-        Log::error "#{e.class} " + e.message
+        Log::error "#{e.class} #{Util::strip_newlines e.message}"
         return nil
       end
 
@@ -65,32 +66,40 @@ module Adbot
       Log::info "scanning #{url_result.domain + url_result.path} scan_id #{scan_id}", "adbot"
       
       begin
+        Log::debug "launching browser (#{url_result.domain}, selenium://#{options.selenium_host}:#{options.selenium_port})", "adbot"
         browser = SeleniumInterface::browser( url_result.domain, options.selenium_host, options.selenium_port )
         raise unless browser
 
+        Log::debug "opening page", "adbot"
         if url_result.path.length > 0
           SeleniumInterface::open_page( browser, url_result.path )
         else
           SeleniumInterface::open_page browser
         end
 
+        Log::debug "getting page source", "adbot"
         html = SeleniumInterface::get_page_source browser
         raise unless html
 
         html = Util::unescape_html html rescue html
         url_result.html = html
 
+        Log::debug "injecting top-level browser_util", "adbot"
         SeleniumInterface::include_browser_util browser
 
+        Log::debug "getting ads", "adbot"
         url_result.ads = SeleniumInterface::get_ads browser
+        Log::debug "done getting ads", "adbot"
         url_result.page_width = SeleniumInterface::page_width browser
         url_result.page_height = SeleniumInterface::page_height browser
         url_result.title = SeleniumInterface::page_title browser
 
         #url_result.screenshot = SeleniumInterface::page_screenshot browser
         #File.open("/tmp/#{url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue Log::info "failed to save screenshot"
-        
+
+        Log::debug "following ad link urls", "adbot"
         follow_ad_link_urls( url_result.ads, browser, url_result.domain, options )
+        Log::debug "done following ad link urls", "adbot"
 
         url_result.screenshot = nil
         Log::debug "final struct:"
@@ -103,7 +112,7 @@ module Adbot
         # Timeout::Error, raised if an http connection times out, derives from Interrupt, which is also the exception for SIGnals.
         # catch Timeout::Error, but re-raise Interrupt so that SIGnals work correctly.
         Log::error e.backtrace.join "\t"
-        Log::error "#{e.class} " + e.message
+        Log::error "#{e.class} #{Util::strip_newlines e.message}"
         url_result.exception = e
       rescue Interrupt, SystemExit => e
         Log::fatal "scan.rb: re-raising caught exception: #{e.class} (#{e.class.ancestors.join ","})"
@@ -112,6 +121,7 @@ module Adbot
         Log::fatal "scan.rb: re-raising unknown exception: #{e.class} (#{e.class.ancestors.join ","})"
         raise
       ensure
+        Log::debug "ending browser session", "adbot"
         SeleniumInterface::end_session browser
       end 
       
