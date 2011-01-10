@@ -12,6 +12,9 @@ module SeleniumInterface
   JQUERY_SCRIPT = File.read( Util.here( JQUERY_FILE ) )
   BROWSER_UTIL_SCRIPT = File.read( Util.here( BROWSER_UTIL_SCRIPT_FILE ) )
 
+  MAX_ADS = 100
+  MAX_FRAME_DEPTH = 10
+
   class << self
 
     MINI_PAGE_TIMEOUT = 40 # seconds
@@ -137,16 +140,18 @@ module SeleniumInterface
       frame_names.split ","
     end
 
-    def get_ads_in_current_frame( browser )
+    def get_ads_in_current_frame( browser, total_ads_found )
       Log::debug "entering get_ads_in_current_frame", "selenium"
       on browser, "ADBOTjQuery( this.browserbot.getUserWindow().adbot.process_ads )"
       
       ads = []
       on browser, "adbot.ad_iterator()"
       while( true )
+        raise "ad limit reached (#{total_ads_found})" unless total_ads_found < MAX_ADS
         on browser, "adbot.next_ad()"
         break unless (on browser, "adbot.is_next_ad") == "true"
-
+        total_ads_found += 1
+        
         ad = OpenStruct.new
         ads << ad
 
@@ -180,19 +185,21 @@ module SeleniumInterface
       ads
     end
 
-    def get_ads( browser )
-      Log::debug "entering get_ads", "selenium"
-      ads = get_ads_in_current_frame browser
+    def get_ads( browser, total_ads_found = 0, frame_depth = 1 )
+      Log::debug "entering get_ads (total ads found #{total_ads_found}, frame depth #{frame_depth})", "selenium"
+      raise "frame depth limit reached (#{frame_depth})" unless frame_depth < MAX_FRAME_DEPTH
+      ads = get_ads_in_current_frame browser, total_ads_found
       (get_ad_frames browser).each do |frame|
         Log::debug "entering frame #{frame}", "selenium"
         browser.select_frame frame
         include_browser_util browser
         on browser, "ADBOTjQuery('a,iframe,object,embed').addClass(this.browserbot.getUserWindow().adbot.ad_class)"
-        ads.concat(get_ads browser)
+        ads.concat(get_ads browser, total_ads_found, frame_depth + 1 )
+        total_ads_found = ads.size
         browser.select_frame "relative=up"
         Log::debug "exited frame #{frame}", "selenium"
       end
-      Log::debug "exiting get_ads", "selenium"
+      Log::debug "exiting get_ads (total ads found #{total_ads_found}, frame depth #{frame_depth})", "selenium"
       ads
     end
 
