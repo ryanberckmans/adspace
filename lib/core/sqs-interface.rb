@@ -29,8 +29,12 @@ module AWS
 
       begin
         @@queue = @@sqs.queue(QUEUE_NAME, true )
-        @@queue.set_attribute 'VisibilityTimeout', QUEUE_VISIBILITY
-        Log::info "connected to queue #{QUEUE_NAME}, visibility #{@@queue.visibility}s", "sqs"
+        Log::info "connected to queue #{QUEUE_NAME}", "sqs"
+        Log::info "queue visibility #{@@queue.visibility}s (expected #{QUEUE_VISIBILITY}s)", "sqs"
+        if @@queue.visibility.to_i != QUEUE_VISIBILITY
+          @@queue.set_attribute 'VisibilityTimeout', QUEUE_VISIBILITY
+          Log::info "set queue visibility to #{@@queue.visibility}", "sqs"
+        end
       rescue Exception => e
         Log::error e.backtrace.join "\t"
         Log::error "#{e.class} #{Util::strip_newlines e.message}"
