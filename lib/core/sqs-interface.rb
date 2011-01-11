@@ -14,7 +14,7 @@ module AWS
     #   it is our responsibility to handle redundant/duplicate messages
 
     QUEUE_NAME = $SQS_QUEUE || "scan-queue"
-    QUEUE_VISIBILITY = 600 # seconds
+    QUEUE_VISIBILITY = 60 * 60 * 2 # seconds
 
     class << self
 
@@ -28,7 +28,9 @@ module AWS
       end
 
       begin
-        @@queue = @@sqs.queue(QUEUE_NAME, true, QUEUE_VISIBILITY)
+        @@queue = @@sqs.queue(QUEUE_NAME, true )
+        @@queue.set_attribute 'VisibilityTimeout', QUEUE_VISIBILITY
+        Log::info "connected to queue #{QUEUE_NAME}, visibility #{@@queue.visibility}s", "sqs"
       rescue Exception => e
         Log::error e.backtrace.join "\t"
         Log::error "#{e.class} #{Util::strip_newlines e.message}"
