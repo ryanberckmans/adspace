@@ -9,7 +9,7 @@ options = Adbot::parse_options( ARGV )
 Dir.chdir options.pwd if options.pwd
 logdev = STDOUT
 logdev = File.open "/dev/null", "a" if options.no_log
-Log::get logdev, { :default => true, :level => Logger::DEBUG }
+Log::get logdev, { :default => true, :level => Logger::WARN }
 
 begin
   require 'active_record'
@@ -31,16 +31,18 @@ begin
 
   ActiveRecord::Base.establish_connection YAML.load_file('../database.yml')[ ENV['RAILS_ENV'] ]
 
+  time = Time.now
   total = Scan.count
-  limit = 1000
+  limit = 2500
   offset = 0
+  puts "dumping database, total scans #{total}, increments of #{limit}"
   while offset < total
     scans = Scan.find :all, :offset => offset, :limit => limit, :conditions => ["scan_completed = ?", true], :include => [ :ads, :domain, :scan_fail]
     scans.each do |s| Adbot::output_tabular s, options end
     puts "%3.2f%" % [100 * (offset.to_f + limit) / total,100.0].min
     offset += limit
   end
-  puts "done"
+  puts "done, took #{"%4.2f" % ((Time.now - time) / 60.0)} minutes"
 rescue Exception => e
   Log::fatal "uncaught exception #{e.class}", "adbot"
   Log::fatal e.backtrace.join "\t"
