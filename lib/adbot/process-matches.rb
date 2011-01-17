@@ -49,7 +49,6 @@ module Adbot
     end
 
     def output_tabular( scan, options )
-      output_tabular_headers options.output_dir if not File.exists? options.output_dir
       begin
         to_write = ""
         tab = "\t"

@@ -12,6 +12,9 @@ logdev = File.open "/dev/null", "a" if options.no_log
 Log::get logdev, { :default => true, :level => Logger::WARN }
 
 begin
+  raise "file #{options.output_dir} already exists" if File.exists? options.output_dir
+  Adbot::output_tabular_headers options.output_dir 
+
   require 'active_record'
   require 'right_aws'
   require 'yaml'
@@ -33,16 +36,17 @@ begin
 
   time = Time.now
   total = Scan.count
-  limit = 2500
+  limit = 1000
   offset = 0
-  puts "dumping database, total scans #{total}, increments of #{limit}"
+  puts "dumping database to file #{options.output_dir}, total scans #{total}, increments of #{limit}"
   while offset < total
+    incremental_time = Time.now
     scans = Scan.find :all, :offset => offset, :limit => limit, :conditions => ["scan_completed = ?", true], :include => [ :ads, :domain, :scan_fail]
     scans.each do |s| Adbot::output_tabular s, options end
-    puts "%3.2f%" % [100 * (offset.to_f + limit) / total,100.0].min
+    puts "#{"%3.2f" % ([100 * (offset.to_f + limit) / total,100.0].min) }% complete, total time #{"%4.2f" % ((Time.now - time) / 60.0)}m, incremental time #{"%3.2f" % (Time.now - incremental_time)}s"
     offset += limit
   end
-  puts "done, took #{"%4.2f" % ((Time.now - time) / 60.0)} minutes"
+  puts "done, took #{"%4.2f" % ((Time.now - time) / 60.0)}m"
 rescue Exception => e
   Log::fatal "uncaught exception #{e.class}", "adbot"
   Log::fatal e.backtrace.join "\t"
