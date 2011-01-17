@@ -41,16 +41,14 @@ module Adbot
         f.write to_write
         Log::info "wrote tabular headers to #{file_path}"
       rescue Exception => e
-        Log::error e.backtrace.join "\t"
-        Log::error Util::strip_newlines e.message
-        Log::error "#{e.class} failed to write to #{options.output_dir} for #{scan.url}"
+        Log::error "#{e.class} failed to write tabular headers to #{file_path}, re-raising"
+        raise
       ensure
         f.close rescue nil
       end
     end
 
     def output_tabular( scan, options )
-      output_tabular_headers options.output_dir if not File.exists? options.output_dir
       begin
         to_write = ""
         tab = "\t"
@@ -101,9 +99,8 @@ module Adbot
         f.write to_write
         Log::info "wrote results for scan #{scan.id} to #{file_path}"
       rescue Exception => e
-        Log::error e.backtrace.join "\t"
-        Log::error Util::strip_newlines e.message
-        Log::error "#{e.class} failed to write to #{options.output_dir} for scan #{scan.id}"
+        Log::error "#{e.class} failed to write to #{options.output_dir} for scan #{scan.id}, re-raising"
+        raise
       ensure
         f.close rescue nil
       end
