@@ -56,6 +56,31 @@ module Util
                    "path" => uri.path)
   end
 
+  def self.uri_safe_parse( original_uri )
+    # given a uri in the form scheme://host/path, the code encodes/escapes the path into hex (e.g. %2F), and uses the URI library to correctly parse characters like "|"
+
+    # self.uri_safe_parse assumes original:
+    # * is http/https
+    # * includes the full scheme:  http://
+    # * assumes the host is terminated by a slash, i.e. google.com/ not google.com
+    
+    # note: lib URI requires host to be terminated by a literal slash, not %2F, i.e. google.com/ parses correctly, google.com%2f does not parse
+    host = original_uri.slice /^(https?.*?\/\/.*?)\//i, 1
+    path = original_uri.slice /^https?.*?\/\/.*?\/(.*)/i, 1
+
+    return nil unless host and path
+    raise unless host + "/" + path == original_uri
+
+    decoded_host = host.gsub /%(..)/ do $1.hex.chr end
+    encoded_path = path.gsub /./ do "%#{$&[0].to_s(16)}" end
+
+    uri = URI.parse decoded_host + "/" + encoded_path rescue return nil
+
+    decoded_path = uri.path.gsub /%(..)/ do $1.hex.chr end
+    
+    OpenStruct.new "host" => uri.host, "path" => decoded_path, "scheme" => uri.scheme
+  end
+
   def self.unescape_html(string)
     # from pragmatic
     str = string.dup

@@ -36,7 +36,7 @@ begin
 
   time = Time.now
   total = Scan.count
-  limit = 1000
+  limit = 2500
   offset = 0
   puts "dumping database to file #{options.output_dir}, total scans #{total}, increments of #{limit}"
   while offset < total

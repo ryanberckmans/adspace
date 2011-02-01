@@ -32,7 +32,7 @@ module Adbot
 
     def output_tabular_headers( file_path )
       begin
-        headers = %w[ scan_time scan_unix_time scan_id scan_created_at scan_updated_at scan_completed? domain path quantcast_rank page_width page_height page_title scan_failed? fail_message fail_backtrace ads_found? ad_id ad_link_url ad_target_url ad_screenshot_width ad_screenshot_height ad_format ]
+        headers = %w[ scan_time scan_unix_time scan_id scan_created_at scan_updated_at scan_completed? domain path quantcast_rank page_width page_height page_title scan_failed? fail_message fail_backtrace ads_found? ad_id ad_link_url ad_link_url_host ad_link_url_path ad_target_url ad_target_url_host ad_target_url_path ad_screenshot_width ad_screenshot_height ad_format ]
         tab = "\t"
         to_write = ""
         headers.each do |header| to_write += header + tab end
@@ -83,9 +83,30 @@ module Adbot
 
         if scan.ads.length > 0
           scan.ads.each do |ad|
+            ad_target_url_host = ""
+            ad_target_url_path = ""
+            ad_link_url_host = ""
+            ad_link_url_path = ""
+
+            uri = Util::uri_safe_parse ad.target_url
+            if uri
+              ad_target_url_host = uri.host
+              ad_target_url_path = uri.path
+            end
+
+            uri = Util::uri_safe_parse ad.link_url
+            if uri
+              ad_link_url_host = uri.host
+              ad_link_url_path = uri.path
+            end
+            
             to_write += prefix + ad.id.to_s + tab +
               ad.link_url + tab +
+              ad_link_url_host + tab +
+              ad_link_url_path + tab +
               ad.target_url + tab +
+              ad_target_url_host + tab +
+              ad_target_url_path + tab +
               ad.screenshot_width.to_s + tab +
               ad.screenshot_height.to_s + tab +
               ad.format + tab + endl
