@@ -102,11 +102,11 @@ module Adbot
             
             to_write += prefix + ad.id.to_s + tab +
               ad.link_url + tab +
-              ad_link_url_host + tab +
-              ad_link_url_path + tab +
+              ad_link_url_host.to_s + tab +
+              ad_link_url_path.to_s + tab +
               ad.target_url + tab +
-              ad_target_url_host + tab +
-              ad_target_url_path + tab +
+              ad_target_url_host.to_s + tab +
+              ad_target_url_path.to_s + tab +
               ad.screenshot_width.to_s + tab +
               ad.screenshot_height.to_s + tab +
               ad.format + tab + endl
@@ -118,7 +118,7 @@ module Adbot
         file_path = options.output_dir # output dir is treated as a file path when using output_tabular
         f = File.open file_path, "a"
         f.write to_write
-        Log::info "wrote results for scan #{scan.id} to #{file_path}"
+        Log::debug "wrote results for scan #{scan.id} to #{file_path}"
       rescue Exception => e
         Log::error "#{e.class} failed to write to #{options.output_dir} for scan #{scan.id}, re-raising"
         raise
