@@ -9,11 +9,15 @@ options = Adbot::parse_options( ARGV )
 Dir.chdir options.pwd if options.pwd
 logdev = STDOUT
 logdev = File.open "/dev/null", "a" if options.no_log
-Log::get logdev, { :default => true, :level => Logger::WARN }
+Log::get logdev, { :default => true, :level => Logger::INFO }
 
 begin
-  raise "file #{options.output_dir} already exists" if File.exists? options.output_dir
-  Adbot::output_tabular_headers options.output_dir 
+  if File.exists? options.output_dir
+    Log::warn "file #{options.output_dir} already exists"
+  else
+    Log::info "file #{options.output_dir} created"
+    Adbot::output_tabular_headers options.output_dir
+  end
 
   require 'active_record'
   require 'right_aws'
@@ -37,14 +41,14 @@ begin
   time = Time.now
   total = Scan.count
   limit = 2500
-  offset = 0
-  puts "dumping database to file #{options.output_dir}, total scans #{total}, increments of #{limit}"
-  while offset < total
+  first_id = options.start_from ? options.start_from.to_i : 0 
+  last_id = first_id - 1
+  puts "dumping database to file #{options.output_dir}, total scans #{total}, increments of #{limit}, starting with scan #{first_id}"
+  while( scans = Scan.where("scan_completed = :scan_completed AND id > :id", { :id => last_id, :scan_completed => true }).limit(limit).order("id ASC").all).any?
     incremental_time = Time.now
-    scans = Scan.find :all, :offset => offset, :limit => limit, :conditions => ["scan_completed = ?", true], :include => [ :ads, :domain, :scan_fail]
     scans.each do |s| Adbot::output_tabular s, options end
-    puts "#{"%3.2f" % ([100 * (offset.to_f + limit) / total,100.0].min) }% complete, total time #{"%4.2f" % ((Time.now - time) / 60.0)}m, incremental time #{"%3.2f" % (Time.now - incremental_time)}s"
-    offset += limit
+    last_id = scans.last.id
+    puts "#{"%3.2f" % ([100.0 * (last_id - first_id) / (total - first_id),100.0].min) }% complete, total time #{"%4.2f" % ((Time.now - time) / 60.0)}m, incremental time #{"%3.2f" % (Time.now - incremental_time)}s"
   end
   puts "done, took #{"%4.2f" % ((Time.now - time) / 60.0)}m"
 rescue Exception => e

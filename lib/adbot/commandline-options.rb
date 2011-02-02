@@ -15,6 +15,7 @@ module Adbot
       collected_options.sqs_queue = nil
       collected_options.no_log = false
       collected_options.pwd = nil
+      collected_options.start_from = nil
       
       opts = OptionParser.new do |opts|
         opts.banner = "usage: scanner [options]"
@@ -51,6 +52,10 @@ module Adbot
 
         opts.on("--pwd PWD", "optional. set the present working directory to pwd") do |pwd|
           collected_options.pwd = pwd
+        end
+
+        opts.on("--start-from INT", "optional. for database dumping, begin from scan INT") do |start_from|
+          collected_options.start_from = start_from
         end
         
         opts.on_tail("-h", "--help", "show this message") do
