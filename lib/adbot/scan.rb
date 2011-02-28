@@ -95,11 +95,19 @@ module Adbot
         url_result.title = SeleniumInterface::page_title browser
 
         url_result.screenshot = SeleniumInterface::page_screenshot browser
-        #File.open("/tmp/#{url.split("//")[1].gsub("/", ".")}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot rescue Log::info "failed to save screenshot"
+        image_file_domain = url_result.domain.gsub "/", "."
+        image_file_path = url_result.path.gsub "/", "."
+        begin 
+          File.open("/tmp/#{image_file_domain + image_file_path + url_result.scan_time.to_i.to_s}.png", 'w') {|f| f.write(Base64.decode64(url_result.screenshot))} if url_result.screenshot
+        rescue Exception => e
+          Log::error e.backtrace.join "\t"
+          Log::error "#{e.class} #{Util::strip_newlines e.message}"
+          Log::error "failed to save screenshot"
+        end
 
-        Log::debug "following ad link urls", "adbot"
-        follow_ad_link_urls( url_result.ads, browser, url_result.domain, options )
-        Log::debug "done following ad link urls", "adbot"
+        #Log::debug "following ad link urls", "adbot"
+        #follow_ad_link_urls( url_result.ads, browser, url_result.domain, options )
+        #Log::debug "done following ad link urls", "adbot"
 
         url_result.html = nil
         url_result.screenshot = nil
