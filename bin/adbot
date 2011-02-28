@@ -10,6 +10,7 @@ Dir.chdir options.pwd if options.pwd
 logdev = "adbot"
 logdev = STDOUT if options.no_log
 Log::get logdev, { :default => true, :level => Logger::DEBUG }
+Log::info "============================== booting ==============================", "adbot"
 Log::info "initialized", "adbot"
 
 begin
