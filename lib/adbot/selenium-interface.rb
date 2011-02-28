@@ -199,6 +199,7 @@ module SeleniumInterface
         browser.select_frame "relative=up"
         Log::debug "exited frame #{frame}", "selenium"
       end
+      highlight_ads browser
       Log::debug "exiting get_ads (total ads found #{total_ads_found}, frame depth #{frame_depth})", "selenium"
       ads
     end
